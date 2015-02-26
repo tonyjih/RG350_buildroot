@@ -1,0 +1,19 @@
+# Mountpoint of the configfs directory
+CFS_ROOT="/sys/kernel/config"
+
+# ID and name of the manufacturer
+ID_VENDOR="0xa109"
+VENDOR="GCW"
+
+# ID and name of the product
+ID_PRODUCT="4771"
+PRODUCT="GCW Zero"
+
+# Serial number of the device
+SERIAL_NUMBER="00000000"
+
+# Function to use by default
+ACTIVE_FUNCTION="rndis"
+
+# Name of the USB device controller
+UDC_NAME="musb-hdrc.0.auto"

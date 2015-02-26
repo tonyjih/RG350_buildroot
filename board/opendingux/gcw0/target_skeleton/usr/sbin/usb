@@ -1,0 +1,80 @@
+#!/bin/sh
+
+. /etc/default/configfs
+[ -f /usr/local/etc/default/configfs ] && . /usr/local/etc/default/configfs
+
+if [ ! -d ${CFS_ROOT}/usb_gadget ] ; then
+	echo 'configfs not mounted!' >&2
+	exit 1
+fi
+
+usb_disable() {
+	for FUNCTION in ${CFS_ROOT}/usb_gadget/* ; do
+		echo "" > ${FUNCTION}/UDC
+	done
+}
+
+usb_start() {
+	ROOT=${CFS_ROOT}/usb_gadget/${ACTIVE_FUNCTION}
+	ROOT_CFG=${ROOT}/configs/${ACTIVE_FUNCTION}.1
+	ROOT_FCN=${ROOT}/functions/${ACTIVE_FUNCTION}.${ACTIVE_FUNCTION}
+
+	mkdir ${ROOT} ${ROOT}/strings/0x409
+	echo ${ID_VENDOR} > ${ROOT}/idVendor
+	echo ${ID_PRODUCT} > ${ROOT}/idProduct
+	echo ${SERIAL_NUMBER} > ${ROOT}/strings/0x409/serialnumber
+	echo ${VENDOR} > ${ROOT}/strings/0x409/manufacturer
+	echo ${PRODUCT} > ${ROOT}/strings/0x409/product
+
+	mkdir ${ROOT_CFG} ${ROOT_CFG}/strings/0x409
+	echo ${ACTIVE_FUNCTION} > ${ROOT_CFG}/strings/0x409/configuration
+
+	mkdir ${ROOT_FCN}
+	ln -s ${ROOT_FCN} ${ROOT_CFG}/${ACTIVE_FUNCTION}.${ACTIVE_FUNCTION}
+
+	usb_disable
+	echo ${UDC_NAME} > ${CFS_ROOT}/usb_gadget/${ACTIVE_FUNCTION}/UDC
+}
+
+usb_stop() {
+	usb_disable
+
+	for ROOT in ${CFS_ROOT}/usb_gadget/* ; do
+		FUNCTION=`basename ${ROOT}`
+
+		rm ${ROOT}/configs/${FUNCTION}.1/${FUNCTION}.${FUNCTION}
+		rmdir ${ROOT}/configs/${FUNCTION}.1/strings/0x409 \
+			${ROOT}/configs/${FUNCTION}.1 \
+			${ROOT}/functions/${FUNCTION}.${FUNCTION} \
+			${ROOT}/strings/0x409 \
+			${ROOT}
+	done
+}
+
+usb_get_status() {
+	if [ -d ${CFS_ROOT}/usb_gadget/${ACTIVE_FUNCTION} ] ; then
+		if [ "`cat ${CFS_ROOT}/usb_gadget/${ACTIVE_FUNCTION}/UDC`" = ${UDC_NAME} ] ; then
+			echo "USB is enabled with function ${ACTIVE_FUNCTION}"
+			return 0
+		fi
+	fi
+
+	echo "USB is not enabled"
+	return 1
+}
+
+case "$1" in
+	--start)
+		usb_start
+		;;
+	--stop)
+		usb_stop
+		;;
+	--status)
+		usb_get_status
+		exit $?
+		;;
+	*)
+		echo "Usage: ap [--start|--stop|--status]"
+		;;
+esac
