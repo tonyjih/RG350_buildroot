@@ -1,0 +1,2 @@
+SUBSYSTEM=="misc", KERNEL=="mtp_usb", ACTION=="add", RUN+="/sbin/start-stop-daemon -S -q -b -m -p /var/run/mtpserver.pid -x /usr/sbin/mtpserver"
+SUBSYSTEM=="misc", KERNEL=="mtp_usb", ACTION=="remove", RUN+="/sbin/start-stop-daemon -K -q -p /var/run/mtpserver.pid"
