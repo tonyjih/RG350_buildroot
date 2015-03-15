@@ -5,7 +5,7 @@ proc		/proc			proc	defaults		0	0
 devpts		/dev/pts		devpts	gid=5,mode=620		0	0
 tmpfs		/dev/shm		tmpfs	size=128m,mode=1777	0	0
 tmpfs		/var			tmpfs	size=128m,mode=0755	0	0
-tmpfs		/media			tmpfs	ro,size=4k,mode=0755	0	0
+tmpfs		/media			tmpfs	size=4k,mode=0755	0	0
 tmpfs		/mnt			tmpfs	size=4k,mode=0755	0	0
 sysfs		/sys			sysfs	defaults		0	0
 debugfs		/sys/kernel/debug	debugfs	defaults		0	0

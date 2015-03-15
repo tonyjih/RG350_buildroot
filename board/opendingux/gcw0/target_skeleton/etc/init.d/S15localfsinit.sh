@@ -1,13 +1,6 @@
 #!/bin/sh
 
 if [ -z "$1" ] || [ "x$1" = "xstart" ]; then
-
-	# Wait for /media/data to be mounted
-	# (as /usr/local is a symlink to /media/data/local).
-	# /tmp/.media_data_is_mounted is created by a udev rule.
-	/usr/bin/udevadm settle --exit-if-exists=/tmp/.media_data_is_mounted
-	rm /tmp/.media_data_is_mounted
-
 	mkdir -p /media/data/apps
 
 	mkdir -p /media/data/local

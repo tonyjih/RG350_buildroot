@@ -4,6 +4,9 @@ ACTION=="add", PROGRAM!="/sbin/blkid -p %N", GOTO="media_by_label_auto_mount_end
 # The system partition is already mounted at /boot
 ACTION=="add", KERNEL=="mmcblk0p1", GOTO="media_by_label_auto_mount_end"
 
+# The data partition is already mounted at /media/data
+ACTION=="add", KERNEL=="mmcblk0p2", GOTO="media_by_label_auto_mount_end"
+
 # Global mount options
 ACTION=="add", ENV{mount_options}="noatime,nodiratime", ENV{mount_prog}="/bin/mount"
 # Filesystem specific options
@@ -13,15 +16,11 @@ ACTION=="add", ENV{fs_type}=="exfat", ENV{mount_prog}="/usr/sbin/mount.exfat"
 ACTION=="add", ENV{fs_type}=="ntfs", ENV{mount_prog}="/usr/bin/ntfs-3g"
 
 # Get label
-ACTION=="add", KERNEL=="mmcblk0p2", ENV{dir_name}="data"
 ACTION=="add", ENV{dir_name}!="?*", PROGRAM=="/sbin/blkid -o value -p -s LABEL %N", ENV{dir_name}="%c"
 ACTION=="add", KERNEL=="mmcblk1p1", ENV{dir_name}!="?*", ENV{dir_name}="sdcard"
 ACTION=="add", ENV{dir_name}!="?*", ENV{dir_name}="%k"
 
 ACTION=="add", ENV{dir_name}=="?*", RUN+="/bin/mount -o remount,rw /media", RUN+="/bin/mkdir -p '/media/%E{dir_name}'", RUN+="%E{mount_prog} -o %E{mount_options} /dev/%k '/media/%E{dir_name}'", RUN+="/bin/mount -o remount,ro /media"
 ACTION=="remove", ENV{dir_name}=="?*", RUN+="/bin/umount -l '/media/%E{dir_name}'", RUN+="/bin/mount -o remount,rw /media", RUN+="/bin/rmdir '/media/%E{dir_name}'", RUN+="/bin/mount -o remount,ro /media"
-
-# Inform that /media/data is mounted (S15localfsinit.sh needs this).
-ACTION=="add", KERNEL=="mmcblk0p2", RUN+="/bin/touch /tmp/.media_data_is_mounted"
 
 LABEL="media_by_label_auto_mount_end" 
