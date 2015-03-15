@@ -9,5 +9,4 @@ tmpfs		/media			tmpfs	size=4k,mode=0755	0	0
 tmpfs		/mnt			tmpfs	size=4k,mode=0755	0	0
 sysfs		/sys			sysfs	defaults		0	0
 debugfs		/sys/kernel/debug	debugfs	defaults		0	0
-functionfs	/dev/mtp		functionfs	defaults		0	0
 configfs	/sys/kernel/config	configfs	defaults	0	0

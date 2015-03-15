@@ -15,7 +15,7 @@
 
 # Startup the system
 ::sysinit:/bin/mount -o size=64k,mode=0755 -t devtmpfs udev /dev
-::sysinit:/bin/mkdir -p /dev/pts /dev/shm /dev/mtp
+::sysinit:/bin/mkdir -p /dev/pts /dev/shm
 
 ::sysinit:/bin/mount -a
 ::sysinit:/bin/mkdir /var/cache /var/lib /var/lock /var/log /var/run /var/spool /var/tmp /media/data
