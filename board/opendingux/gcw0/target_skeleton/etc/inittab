@@ -20,10 +20,6 @@
 ::sysinit:/bin/mount -a
 ::sysinit:/bin/mkdir /var/cache /var/lib /var/lock /var/log /var/run /var/spool /var/tmp /media/data
 
-# Mount the data partition
-::sysinit:/bin/mount /dev/mmcblk0p2 /media/data
-::sysinit:/bin/mount -o remount,ro /media
-
 ::sysinit:/bin/echo -n 1 > /proc/sys/vm/overcommit_memory
 ::sysinit:/bin/hostname -F /etc/hostname
 
