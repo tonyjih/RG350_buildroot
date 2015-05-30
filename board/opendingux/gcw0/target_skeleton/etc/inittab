@@ -21,7 +21,6 @@
 ::sysinit:/bin/mkdir /var/cache /var/lib /var/lock /var/log /var/run /var/spool /var/tmp /media/data
 
 ::sysinit:/bin/echo -n 1 > /proc/sys/vm/overcommit_memory
-::sysinit:/bin/hostname -F /etc/hostname
 
 # now run any rc scripts
 ::sysinit:/etc/init.d/rcS start
