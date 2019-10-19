@@ -18,7 +18,7 @@ endef
 
 define GNG_INSTALL_OPK_IMAGES
     (   cd $(@D) ; \
-        . make_opk.sh ; \
+        ./make_opk.sh ; \
         mkdir -p $(BINARIES_DIR)/opks ; \
         cp -vf ./*.opk $(BINARIES_DIR)/opks )
 endef

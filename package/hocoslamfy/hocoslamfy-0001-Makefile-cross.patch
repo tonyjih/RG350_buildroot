@@ -1,0 +1,14 @@
+diff -aurp hocoslamfy-f60f367938321f0bd5cf355c5721905bc5c41812/Makefile hocoslamfy-f60f367938321f0bd5cf355c5721905bc5c41812-patched/Makefile
+--- hocoslamfy-f60f367938321f0bd5cf355c5721905bc5c41812/Makefile	2019-10-13 08:33:34.000000000 +0000
++++ hocoslamfy-f60f367938321f0bd5cf355c5721905bc5c41812-patched/Makefile	2019-10-19 06:40:39.483687011 +0000
+@@ -1,8 +1,8 @@
+ TARGET      ?= hocoslamfy-od
+ 
+ ifeq ($(TARGET), hocoslamfy-od)
+-  CC        := mipsel-linux-gcc
+-  STRIP     := mipsel-linux-strip
++  CC        := $(CROSS_COMPILE)gcc
++  STRIP     := $(CROSS_COMPILE)strip
+   OBJS       = platform/opendingux.o
+   DEFS      := -DOPK
+ else
