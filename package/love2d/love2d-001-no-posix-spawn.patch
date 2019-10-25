@@ -1,19 +1,18 @@
 diff --git a/src/modules/system/System.cpp b/src/modules/system/System.cpp
-index dd74c12..8d9b231 100755
+index d85a947..9e98983 100644
 --- a/src/modules/system/System.cpp
 +++ b/src/modules/system/System.cpp
-@@ -25,9 +25,7 @@
- #if defined(LOVE_MACOSX)
- #include <CoreServices/CoreServices.h>
+@@ -39,7 +39,8 @@
+ #if defined(LOVE_ANDROID)
+ #include "common/android.h"
  #elif defined(LOVE_LINUX)
 -#include <spawn.h>
--//#include <stdlib.h>
--//#include <unistd.h>
++//#include <spawn.h>
 +#include <unistd.h>
- #include <sys/wait.h>
- #elif defined(LOVE_WINDOWS)
- #include "common/utf8.h"
-@@ -54,11 +52,6 @@ std::string System::getOS() const
+ #endif
+ 
+ namespace love
+@@ -70,11 +71,6 @@ std::string System::getOS() const
  #endif
  }
  
@@ -25,7 +24,7 @@ index dd74c12..8d9b231 100755
  bool System::openURL(const std::string &url) const
  {
  
-@@ -79,19 +72,20 @@ bool System::openURL(const std::string &url) const
+@@ -102,21 +98,20 @@ bool System::openURL(const std::string &url) const
  #elif defined(LOVE_LINUX)
  
  	pid_t pid;
@@ -36,13 +35,6 @@ index dd74c12..8d9b231 100755
  	// Note: the below const_cast is really ugly as well.
 -	if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, const_cast<char **>(argv), environ) != 0)
 -		return false;
--
--	// Wait for xdg-open to complete (or fail.)
--	int status = 0;
--	if (waitpid(pid, &status, 0) == pid)
--		return (status == 0);
--	else
--		return false;
 +	pid = fork();
 +	if (!pid) {
 +		execlp("xdg-open", "xdg-open", url.c_str(), nullptr);
@@ -51,8 +43,15 @@ index dd74c12..8d9b231 100755
 +		if (waitpid(pid, &status, 0) == pid)
 +			return (status == 0);
 +	}
-+
+ 
+-	// Check if xdg-open already completed (or failed.)
+-	int status = 0;
+-	if (waitpid(pid, &status, WNOHANG) > 0)
+-		return (status == 0);
+-	else
+-		// We can't tell what actually happens without waiting for
+-		// the process to finish, which could take forever (literally).
+-		return true;
 +	return false;
  
  #elif defined(LOVE_WINDOWS)
- 

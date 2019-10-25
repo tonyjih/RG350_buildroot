@@ -3,7 +3,7 @@
 # love2d
 #
 #############################################################
-LOVE2D_VERSION = aeefcc6
+LOVE2D_VERSION = 55dc225
 LOVE2D_SITE = https://bitbucket.org/bartbes/love-experiments
 LOVE2D_SITE_METHOD = hg
 LOVE2D_LICENSE = unknown
