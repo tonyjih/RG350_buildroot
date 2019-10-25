@@ -310,7 +310,7 @@ def init():
 	screen = pygame.display.set_mode((320, 240), pygame.DOUBLEBUF)
 
 	global titleFont, normalFont
-	fontDir = '/usr/share/fonts/truetype/dejavu/'
+	fontDir = '/usr/share/fonts/dejavu/'
 	titleFont = pygame.font.Font(fontDir + 'DejaVuSans-Bold.ttf', 24)
 	normalFont = pygame.font.Font(fontDir + 'DejaVuSansCondensed.ttf', 13)
 
