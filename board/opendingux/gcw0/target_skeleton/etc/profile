@@ -11,6 +11,9 @@ export PATH=\
 # Force GLES graphics for games created with Love2D
 export LOVE_GRAPHICS_USE_OPENGLES=1
 
+# Force alsa to use pcm
+export ALSA_CARD=GCW0
+
 # If running interactively, then:
 if [ "$-" ]; then
 

@@ -5,7 +5,7 @@
 ################################################################################
 
 PWSWD_VERSION = master
-PWSWD_SITE = $(call github,jamesofarrell,RG350_pwswd,$(PWSWD_VERSION))
+PWSWD_SITE = $(call github,tonyjih,RG350_pwswd,$(PWSWD_VERSION))
 
 PWSWD_DEPENDENCIES = alsa-lib libpng libini
 

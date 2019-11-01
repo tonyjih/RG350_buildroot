@@ -1,0 +1,13 @@
+diff -aurp gng-e5054399/Makefile.rg-350 gng-e5054399-patched/Makefile.rg-350
+--- gng-e5054399/Makefile.rg-350	2019-10-17 11:34:58.000000000 +0000
++++ gng-e5054399-patched/Makefile.rg-350	2019-10-19 06:38:30.955856734 +0000
+@@ -7,7 +7,8 @@ CFLAGS = -ggdb \
+     -DLOG_LEVEL=3 \
+     -g -O2 -mips32 \
+     -Wno-write-strings
+-LDFLAGS=`allegro-config --libs`
++SYSROOT=$(shell $(CC) -print-sysroot)
++LDFLAGS=$(shell $(SYSROOT)/usr/bin/allegro-config --libs)
+ LIBS = 
+ OBJS = game.o
+ 

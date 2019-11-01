@@ -34,7 +34,7 @@ endef
 
 define PCSX4ALL_INSTALL_OPK_IMAGES
     (   cd $(@D) ; \
-        . make_opk.sh ; \
+        ./make_opk.sh ; \
         mkdir -p $(BINARIES_DIR)/opks ; \
         cp -vf pcsx4all.opk $(BINARIES_DIR)/opks )
 endef

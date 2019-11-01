@@ -17,7 +17,7 @@ endef
 
 define POCKETSNES_INSTALL_OPK_IMAGES
     (   cd $(@D) ; \
-        . make_opk.sh ; \
+        ./make_opk.sh ; \
         mkdir -p $(BINARIES_DIR)/opks ; \
         cp -vf PocketSNES.opk $(BINARIES_DIR)/opks )
 endef

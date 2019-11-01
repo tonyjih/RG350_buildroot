@@ -5,7 +5,7 @@
 ################################################################################
 
 BZIP2_VERSION = 1.0.6
-BZIP2_SITE = http://www.bzip.org/$(BZIP2_VERSION)
+BZIP2_SITE = https://sourceware.org/pub/bzip2
 BZIP2_INSTALL_STAGING = YES
 BZIP2_LICENSE = bzip2 license
 BZIP2_LICENSE_FILES = LICENSE
