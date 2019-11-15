@@ -1,16 +1,28 @@
+From 5ba6355e489f647c88ca48afbc75965468193181 Mon Sep 17 00:00:00 2001
+From: Gustavo Zacarias <gustavo@zacarias.com.ar>
+Date: Tue, 9 Aug 2016 11:51:53 +0200
+Subject: [PATCH] configure: disable the 'phar' tool
+
 Disable the 'phar' command-line tool build/installation since it requires
 php to run and pack up phar itself in phar format. This would require
 a host-php instance and really probably nobody needs the phar tool
 on the target.
 
 Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
+[Gustavo: update for autoreconf/configure.in]
+Signed-off-by: Adam Duskett <aduskett@gmail.com>
+[Aduskett: update for 7.3.0]
+---
+ configure.ac | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff -Nura php-5.5.14.orig/configure php-5.5.14/configure
---- php-5.5.14.orig/configure	2014-07-08 09:52:52.657753194 -0300
-+++ php-5.5.14/configure	2014-07-08 09:53:07.610243933 -0300
-@@ -112930,13 +112930,8 @@
+diff --git a/configure.ac b/configure.ac
+index d20af76..7f02f1a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1472,13 +1472,8 @@ CFLAGS="\$(CFLAGS_CLEAN) $standard_libtool_flag"
  INLINE_CFLAGS="$INLINE_CFLAGS $standard_libtool_flag"
- CXXFLAGS="$CXXFLAGS $standard_libtool_flag"
+ CXXFLAGS="$CXXFLAGS $standard_libtool_flag \$(PROF_FLAGS)"
  
 -if test "$PHP_PHAR" != "no" && test "$PHP_CLI" != "no"; then
 -  pharcmd=pharcmd
@@ -24,3 +36,6 @@ diff -Nura php-5.5.14.orig/configure php-5.5.14/configure
  
  all_targets="$lcov_target \$(OVERALL_TARGET) \$(PHP_MODULES) \$(PHP_ZEND_EX) \$(PHP_BINARIES) $pharcmd"
  install_targets="$install_sapi $install_modules $install_binaries install-build install-headers install-programs $install_pear $pharcmd_install"
+-- 
+2.14.3
+
