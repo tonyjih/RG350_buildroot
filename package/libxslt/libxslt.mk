@@ -4,16 +4,19 @@
 #
 ################################################################################
 
-LIBXSLT_VERSION = 1.1.28
-LIBXSLT_SITE = ftp://xmlsoft.org/libxslt
+LIBXSLT_VERSION = 1.1.33
+LIBXSLT_SITE = http://xmlsoft.org/sources
 LIBXSLT_INSTALL_STAGING = YES
 LIBXSLT_LICENSE = MIT
 LIBXSLT_LICENSE_FILES = COPYING
 
-LIBXSLT_CONF_OPTS = --with-gnu-ld --without-debug \
-		--without-python --with-libxml-prefix=$(STAGING_DIR)/usr/
+LIBXSLT_CONF_OPTS = \
+	--with-gnu-ld \
+	--without-debug \
+	--without-python \
+	--with-libxml-prefix=$(STAGING_DIR)/usr
 LIBXSLT_CONFIG_SCRIPTS = xslt-config
-LIBXSLT_DEPENDENCIES = libxml2
+LIBXSLT_DEPENDENCIES = host-pkgconf libxml2
 
 # If we have enabled libgcrypt then use it, else disable crypto support.
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
@@ -25,7 +28,7 @@ endif
 
 HOST_LIBXSLT_CONF_OPTS = --without-debug --without-python --without-crypto
 
-HOST_LIBXSLT_DEPENDENCIES = host-libxml2
+HOST_LIBXSLT_DEPENDENCIES = host-pkgconf host-libxml2
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
