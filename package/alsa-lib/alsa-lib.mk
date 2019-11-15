@@ -4,22 +4,25 @@
 #
 ################################################################################
 
-ALSA_LIB_VERSION = 1.0.28
+ALSA_LIB_VERSION = 1.1.9
 ALSA_LIB_SOURCE = alsa-lib-$(ALSA_LIB_VERSION).tar.bz2
-ALSA_LIB_SITE = http://alsa.cybermirror.org/lib
-ALSA_LIB_LICENSE = LGPLv2.1+
-ALSA_LIB_LICENSE_FILES = COPYING
+ALSA_LIB_SITE = ftp://ftp.alsa-project.org/pub/lib
+ALSA_LIB_LICENSE = LGPL-2.1+ (library), GPL-2.0+ (aserver)
+ALSA_LIB_LICENSE_FILES = COPYING aserver/COPYING
 ALSA_LIB_INSTALL_STAGING = YES
 ALSA_LIB_CFLAGS = $(TARGET_CFLAGS)
 ALSA_LIB_AUTORECONF = YES
-ALSA_LIB_CONF_OPTS = --with-alsa-devdir=$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_DEVDIR)) \
-		    --with-pcm-plugins="$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_PCM_PLUGINS))" \
-		    --with-ctl-plugins="$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_CTL_PLUGINS))" \
-		    --without-versioned
+ALSA_LIB_CONF_OPTS = \
+	--with-alsa-devdir=$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_DEVDIR)) \
+	--with-pcm-plugins="$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_PCM_PLUGINS))" \
+	--with-ctl-plugins="$(call qstrip,$(BR2_PACKAGE_ALSA_LIB_CTL_PLUGINS))" \
+	--without-versioned
 
 # Can't build with static & shared at the same time (1.0.25+)
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
-ALSA_LIB_CONF_OPTS += --enable-shared=no
+ifeq ($(BR2_STATIC_LIBS),y)
+ALSA_LIB_CONF_OPTS += \
+	--enable-shared=no \
+	--without-libdl
 else
 ALSA_LIB_CONF_OPTS += --enable-static=no
 endif
@@ -49,14 +52,6 @@ ifneq ($(BR2_PACKAGE_ALSA_LIB_OLD_SYMBOLS),y)
 ALSA_LIB_CONF_OPTS += --disable-old-symbols
 endif
 
-ifeq ($(BR2_ENABLE_DEBUG),y)
-ALSA_LIB_CONF_OPTS += --enable-debug
-endif
-
-ifeq ($(BR2_avr32),y)
-ALSA_LIB_CFLAGS += -DAVR32_INLINE_BUG
-endif
-
 ifeq ($(BR2_PACKAGE_ALSA_LIB_PYTHON),y)
 ALSA_LIB_CONF_OPTS += \
 	--with-pythonlibs=-lpython$(PYTHON_VERSION_MAJOR) \
@@ -67,17 +62,8 @@ else
 ALSA_LIB_CONF_OPTS += --disable-python
 endif
 
-ifeq ($(BR2_SOFT_FLOAT),y)
-ALSA_LIB_CONF_OPTS += --with-softfloat
-endif
-
-ifeq ($(BR2_bfin),y)
-# blackfin external toolchains don't have versionsort. Fake it using alphasort
-# instead
-ALSA_LIB_CFLAGS += -Dversionsort=alphasort
-endif
-
-ALSA_LIB_CONF_ENV = CFLAGS="$(ALSA_LIB_CFLAGS)" \
-		    LDFLAGS="$(TARGET_LDFLAGS) -lm"
+ALSA_LIB_CONF_ENV = \
+	CFLAGS="$(ALSA_LIB_CFLAGS)" \
+	LDFLAGS="$(TARGET_LDFLAGS) -lm"
 
 $(eval $(autotools-package))
