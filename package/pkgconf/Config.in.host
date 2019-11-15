@@ -1,5 +1,5 @@
-config BR2_PACKAGE_PKGCONF
-	bool "pkgconf"
+config BR2_PACKAGE_HOST_PKGCONF
+	bool "host pkgconf"
 	help
 	  pkgconf is a program which helps to configure compiler and
 	  linker flags for development frameworks. It is similar to
@@ -7,4 +7,4 @@ config BR2_PACKAGE_PKGCONF
 	  2011 to replace pkg-config, which now needs itself to build
 	  itself
 
-	  http://pkgconf.org/
+	  https://github.com/pkgconf/pkgconf
