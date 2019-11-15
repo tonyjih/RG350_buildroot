@@ -8,7 +8,7 @@ SUDO_VERSION = 1.8.8
 SUDO_SITE    = http://www.sudo.ws/sudo/dist
 SUDO_LICENSE = ICS BSD-3c
 SUDO_LICENSE_FILES = doc/LICENSE
-SUDO_CONF_OPT = \
+SUDO_CONF_OPTS = \
 		--without-lecture \
 		--without-sendmail \
 		--without-umask \

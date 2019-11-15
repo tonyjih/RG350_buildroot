@@ -14,7 +14,7 @@ PROCPS_NG_DEPENDENCIES = ncurses
 
 ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
 PROCPS_NG_DEPENDENCIES += gettext
-PROCPS_NG_CONF_OPT += LIBS=-lintl
+PROCPS_NG_CONF_OPTS += LIBS=-lintl
 endif
 
 $(eval $(autotools-package))

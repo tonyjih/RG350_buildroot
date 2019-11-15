@@ -11,7 +11,7 @@ SDL2_IMAGE_INSTALL_STAGING = YES
 SDL2_IMAGE_LICENSE = zlib
 SDL2_IMAGE_LICENSE_FILES = COPYING.txt
 
-SDL2_IMAGE_CONF_OPT = --with-sdl-prefix=$(STAGING_DIR)/usr \
+SDL2_IMAGE_CONF_OPTS = --with-sdl-prefix=$(STAGING_DIR)/usr \
 		--with-sdl-exec-prefix=$(STAGING_DIR)/usr \
 		--disable-sdltest \
 		--disable-static \

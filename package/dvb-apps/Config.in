@@ -1,6 +1,5 @@
 config BR2_PACKAGE_DVB_APPS
 	bool "dvb-apps"
-	depends on BR2_LARGEFILE
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3
 	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
@@ -12,4 +11,4 @@ config BR2_PACKAGE_DVB_APPS
 	  http://linuxtv.org/hg/dvb-apps
 
 comment "dvb-apps utils needs a toolchain w/ largefile, threads, headers >= 3.3"
-	depends on !BR2_LARGEFILE || !BR2_TOOLCHAIN_HAS_THREADS || !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3
+	depends on !BR2_TOOLCHAIN_HAS_THREADS || !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3

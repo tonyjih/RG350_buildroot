@@ -44,7 +44,6 @@ config BR2_PACKAGE_MPD_AUDIOFILE
 
 config BR2_PACKAGE_MPD_PULSEAUDIO
 	bool "pulseaudio"
-	depends on BR2_LARGEFILE # pulseaudio -> libsndfile
 	depends on BR2_ARCH_HAS_ATOMICS # pulseaudio
 	select BR2_PACKAGE_PULSEAUDIO
 	help
@@ -52,7 +51,6 @@ config BR2_PACKAGE_MPD_PULSEAUDIO
 
 comment "pulseaudio support needs a toolchain w/ largefile"
 	depends on BR2_ARCH_HAS_ATOMICS
-	depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_BZIP2
 	bool "bzip2"
@@ -83,14 +81,13 @@ config BR2_PACKAGE_MPD_FLAC
 config BR2_PACKAGE_MPD_FFMPEG
 	bool "ffmpeg"
 	select BR2_PACKAGE_FFMPEG
-	depends on BR2_LARGEFILE
 	depends on BR2_INET_IPV6
 	help
 	  Enable ffmpeg input support.
 	  Select this if you want to play back files supported by ffmpeg.
 
 comment "ffmpeg support needs a toolchain w/ largefile, IPv6"
-	depends on !(BR2_LARGEFILE && BR2_INET_IPV6)
+	depends on !BR2_INET_IPV6
 
 config BR2_PACKAGE_MPD_LAME
 	bool "lame"
@@ -108,13 +105,9 @@ config BR2_PACKAGE_MPD_LIBSAMPLERATE
 config BR2_PACKAGE_MPD_LIBSNDFILE
 	bool "libsndfile"
 	select BR2_PACKAGE_LIBSNDFILE
-	depends on BR2_LARGEFILE
 	help
 	  Enable libsndfile input/streaming support.
 	  Select this if you want to play back WAV files.
-
-comment "libsndfile support needs a toolchain w/ largefile"
-	depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_MAD
 	bool "mad"
@@ -182,13 +175,9 @@ config BR2_PACKAGE_MPD_TREMOR
 
 config BR2_PACKAGE_MPD_TWOLAME
 	bool "twolame"
-	depends on BR2_LARGEFILE # twolame -> libsndfile
 	select BR2_PACKAGE_TWOLAME
 	help
 	  Enable TwoLAME mp2 encoding.
-
-comment "twolame support needs a toolchain w/ largefile"
-        depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_VORBIS
 	bool "vorbis"

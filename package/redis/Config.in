@@ -2,7 +2,6 @@ config BR2_PACKAGE_REDIS
 	bool "redis"
 	depends on BR2_USE_MMU # fork()
 	depends on BR2_TOOLCHAIN_HAS_THREADS
-	depends on BR2_LARGEFILE
 	help
 	  Redis is an open source, advanced key-value store. It is
 	  often referred to as a data structure server since keys can
@@ -12,4 +11,4 @@ config BR2_PACKAGE_REDIS
 
 comment "redis needs a toolchain w/ largefile, threads"
 	depends on BR2_USE_MMU
-	depends on !BR2_LARGEFILE || !BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_TOOLCHAIN_HAS_THREADS

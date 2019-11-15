@@ -11,7 +11,7 @@ RSYSLOG_LICENSE_FILES = COPYING COPYING.LESSER COPYING.ASL20
 RSYSLOG_DEPENDENCIES = zlib libestr liblogging json-c util-linux host-pkgconf
 RSYSLOG_AUTORECONF = YES
 
-RSYSLOG_CONF_OPT = --disable-testbench \
+RSYSLOG_CONF_OPTS = --disable-testbench \
 		   --enable-cached-man-pages
 
 # Build after BusyBox
@@ -26,9 +26,9 @@ endif
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
 	RSYSLOG_DEPENDENCIES += libgcrypt
 	RSYSLOG_CONF_ENV += LIBGCRYPT_CONFIG=$(STAGING_DIR)/usr/bin/libgcrypt-config
-	RSYSLOG_CONF_OPT += --enable-libgcrypt=yes
+	RSYSLOG_CONF_OPTS += --enable-libgcrypt=yes
 else
-	RSYSLOG_CONF_OPT += --enable-libgcrypt=no
+	RSYSLOG_CONF_OPTS += --enable-libgcrypt=no
 endif
 
 define RSYSLOG_INSTALL_INIT_SYSV

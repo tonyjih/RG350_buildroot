@@ -31,12 +31,12 @@ POCO_OMIT = Data/ODBC PageCompiler					\
 	$(if $(BR2_PACKAGE_POCO_DATA_SQLITE),,Data/SQLite)
 
 ifeq ($(LIBC),uclibc)
-POCO_CONF_OPT += --no-fpenvironment --no-wstring
+POCO_CONF_OPTS += --no-fpenvironment --no-wstring
 endif
 
 # architectures missing some FE_* in their fenv.h
 ifeq ($(BR2_sh4a)$(BR2_nios2),y)
-POCO_CONF_OPT += --no-fpenvironment
+POCO_CONF_OPTS += --no-fpenvironment
 endif
 
 define POCO_CONFIGURE_CMDS

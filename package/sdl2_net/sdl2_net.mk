@@ -13,7 +13,7 @@ SDL2_NET_LICENSE_FILES = COPYING.txt
 
 SDL2_NET_DEPENDENCIES = sdl2
 
-SDL2_NET_CONF_OPT = --localstatedir=/var \
+SDL2_NET_CONF_OPTS = --localstatedir=/var \
 		--with-sdl-prefix=$(STAGING_DIR)/usr \
 		--with-sdl-exec-prefix=$(STAGING_DIR)/usr \
 		--disable-static \

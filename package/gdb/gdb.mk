@@ -53,7 +53,7 @@ endif
 # When gdb sources are fetched from the binutils-gdb repository, they
 # also contain the binutils sources, but binutils shouldn't be built,
 # so we disable it.
-GDB_DISABLE_BINUTILS_CONF_OPT = \
+GDB_DISABLE_BINUTILS_CONF_OPTS = \
 	--disable-binutils \
 	--disable-ld \
 	--disable-gas
@@ -69,7 +69,7 @@ GDB_CONF_ENV = \
 	bash_cv_have_mbstate_t=yes \
 	gdb_cv_func_sigsetjmp=yes
 
-GDB_CONF_OPT = \
+GDB_CONF_OPTS = \
 	--without-uiout \
 	--disable-tui \
 	--disable-gdbtk \
@@ -110,7 +110,7 @@ endif
 #  * --disable-shared, otherwise the old 6.7 version specific to AVR32
 #    doesn't build because it wants to link a shared libbfd.so against
 #    non-PIC liberty.a.
-HOST_GDB_CONF_OPT = \
+HOST_GDB_CONF_OPTS = \
 	--target=$(GNU_TARGET_NAME) \
 	--enable-static --disable-shared \
 	--without-uiout \

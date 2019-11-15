@@ -8,7 +8,6 @@ config BR2_PACKAGE_LTRACE
 		|| BR2_powerpc || BR2_sparc || BR2_x86_64)
 	select BR2_PACKAGE_LIBELF
 	select BR2_PACKAGE_ELFUTILS
-	depends on BR2_LARGEFILE # elfutils
 	depends on BR2_USE_WCHAR # elfutils
 	help
 	  Debugging program which runs a specified command until it exits.
@@ -19,4 +18,4 @@ config BR2_PACKAGE_LTRACE
 	  http://ltrace.org
 
 comment "ltrace needs toolchain w/ largefile, wchar"
-	depends on !BR2_LARGEFILE || !BR2_USE_WCHAR
+	depends on !BR2_USE_WCHAR

@@ -12,7 +12,7 @@ LIGHTNING_INSTALL_STAGING = YES
 
 ifeq ($(BR2_PACKAGE_BINUTILS),y)
 LIGHTNING_DEPENDENCIES += binutils
-LIGHTNING_CONF_OPT += --enable-disassembler
+LIGHTNING_CONF_OPTS += --enable-disassembler
 endif
 
 $(eval $(autotools-package))

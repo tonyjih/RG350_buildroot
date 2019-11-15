@@ -19,7 +19,8 @@
 #
 ################################################################################
 
-PERL_ARCHNAME	= $(ARCH)-linux
+PERL_ARCHNAME = $(ARCH)-linux
+PERL_RUN = PERL5LIB= PERL_USE_UNSAFE_INC=1 $(HOST_DIR)/bin/perl
 
 ################################################################################
 # inner-perl-package -- defines how the configuration, compilation and
@@ -38,6 +39,24 @@ PERL_ARCHNAME	= $(ARCH)-linux
 
 define inner-perl-package
 
+# Target packages need both the perl interpreter on the target (for
+# runtime) and the perl interpreter on the host (for
+# compilation). However, host packages only need the perl
+# interpreter on the host.
+ifeq ($(4),target)
+$(2)_DEPENDENCIES += host-perl perl
+else
+$(2)_DEPENDENCIES += host-perl
+endif
+
+# From http://perldoc.perl.org/CPAN.html#Config-Variables - prefer_installer
+#       legal values are MB and EUMM: if a module comes
+#       with both a Makefile.PL and a Build.PL, use the
+#       former (EUMM) or the latter (MB); if the module
+#       comes with only one of the two, that one will be
+#       used no matter the setting
+$(2)_PREFER_INSTALLER ?= MB
+
 #
 # Configure step. Only define it if not already defined by the package
 # .mk file. And take care of the differences between host and target
@@ -48,10 +67,10 @@ ifeq ($(4),target)
 
 # Configure package for target
 define $(2)_CONFIGURE_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
-		perl Build.PL \
+		$$(PERL_RUN) Build.PL \
 			--config ar="$$(TARGET_AR)" \
 			--config full_ar="$$(TARGET_AR)" \
 			--config cc="$$(TARGET_CC)" \
@@ -69,12 +88,12 @@ define $(2)_CONFIGURE_CMDS
 			--install_path script=/usr/bin \
 			--install_path bindoc=/usr/share/man/man1 \
 			--install_path libdoc=/usr/share/man/man3 \
-			$$($(2)_CONF_OPT); \
+			$$($(2)_CONF_OPTS); \
 	else \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
 		PERL_AUTOINSTALL=--skipdeps \
-		perl Makefile.PL \
+		$$(PERL_RUN) Makefile.PL \
 			AR="$$(TARGET_AR)" \
 			FULL_AR="$$(TARGET_AR)" \
 			CC="$$(TARGET_CC)" \
@@ -83,6 +102,7 @@ define $(2)_CONFIGURE_CMDS
 			LD="$$(TARGET_CC)" \
 			LDDLFLAGS="-shared $$(TARGET_LDFLAGS)" \
 			LDFLAGS="$$(TARGET_LDFLAGS)" \
+			PERL_ARCHLIB=$$(STAGING_DIR)/usr/lib/perl5/$$(PERL_VERSION)/$$(PERL_ARCHNAME) \
 			DESTDIR=$$(TARGET_DIR) \
 			INSTALLDIRS=vendor \
 			INSTALLVENDORLIB=/usr/lib/perl5/site_perl/$$(PERL_VERSION) \
@@ -91,28 +111,24 @@ define $(2)_CONFIGURE_CMDS
 			INSTALLVENDORSCRIPT=/usr/bin \
 			INSTALLVENDORMAN1DIR=/usr/share/man/man1 \
 			INSTALLVENDORMAN3DIR=/usr/share/man/man3 \
-			$$($(2)_CONF_OPT); \
+			$$($(2)_CONF_OPTS); \
 	fi
 endef
 else
 
 # Configure package for host
 define $(2)_CONFIGURE_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
-		perl Build.PL \
-			--install_base $$(HOST_DIR)/usr \
-			--installdirs vendor \
-			$$($(2)_CONF_OPT); \
+		$$(PERL_RUN) Build.PL \
+			$$($(2)_CONF_OPTS); \
 	else \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
 		PERL_AUTOINSTALL=--skipdeps \
-		perl Makefile.PL \
-			INSTALL_BASE=$$(HOST_DIR)/usr \
-			INSTALLDIRS=vendor \
-			$$($(2)_CONF_OPT); \
+		$$(PERL_RUN) Makefile.PL \
+			$$($(2)_CONF_OPTS); \
 	fi
 endef
 endif
@@ -128,22 +144,22 @@ ifeq ($(4),target)
 
 # Build package for target
 define $(2)_BUILD_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_BUILD_OPT) build; \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
+		$$(PERL_RUN) Build $$($(2)_BUILD_OPTS) build; \
 	else \
 		$$(MAKE1) \
-			PERL_INC=$$(STAGING_DIR)/usr/lib/perl5/$$(PERL_VERSION)/$$(PERL_ARCHNAME)/CORE \
-			$$($(2)_BUILD_OPT) pure_all; \
+			FIXIN=: \
+			$$($(2)_BUILD_OPTS) pure_all; \
 	fi
 endef
 else
 
 # Build package for host
 define $(2)_BUILD_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_BUILD_OPT) build; \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
+		$$(PERL_RUN) Build $$($(2)_BUILD_OPTS) build; \
 	else \
-		$$(MAKE1) $$($(2)_BUILD_OPT) pure_all; \
+		$$(MAKE1) $$($(2)_BUILD_OPTS) pure_all; \
 	fi
 endef
 endif
@@ -155,10 +171,10 @@ endif
 #
 ifndef $(2)_INSTALL_CMDS
 define $(2)_INSTALL_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_INSTALL_TARGET_OPT) install; \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
+		$$(PERL_RUN) Build $$($(2)_INSTALL_TARGET_OPTS) install; \
 	else \
-		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPT) pure_install; \
+		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPTS) pure_install; \
 	fi
 endef
 endif
@@ -169,10 +185,10 @@ endif
 #
 ifndef $(2)_INSTALL_TARGET_CMDS
 define $(2)_INSTALL_TARGET_CMDS
-	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_INSTALL_TARGET_OPT) install; \
+	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] && [ $$($(2)_PREFER_INSTALLER) != "EUMM" ] ; then \
+		$$(PERL_RUN) Build $$($(2)_INSTALL_TARGET_OPTS) install; \
 	else \
-		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPT) pure_install; \
+		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPTS) pure_install; \
 	fi
 endef
 endif
@@ -180,6 +196,14 @@ endif
 # Call the generic package infrastructure to generate the necessary
 # make targets
 $(call inner-generic-package,$(1),$(2),$(3),$(4))
+
+# Upgrade helper
+ifneq ($$($(3)_DISTNAME),)
+$(1)-upgrade:
+	utils/scancpan -force -$(4) $$($(3)_DISTNAME)
+
+.PHONY: $(1)-upgrade
+endif
 
 endef
 

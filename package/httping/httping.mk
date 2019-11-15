@@ -17,7 +17,7 @@ HTTPING_DEPENDENCIES = host-gettext \
 	$(if $(BR2_PACKAGE_LIBICONV),libiconv) \
 	$(if $(BR2_PACKAGE_OPENSSL),openssl) \
 	$(if $(BR2_PACKAGE_FFTW),fftw)
-HTTPING_MAKE_OPT = $(TARGET_CONFIGURE_OPTS) \
+HTTPING_MAKE_OPTS = $(TARGET_CONFIGURE_OPTS) \
 	FW=$(if $(BR2_PACKAGE_FFTW),yes,no) \
 	NC=no \
 	SSL=$(if $(BR2_PACKAGE_OPENSSL),yes,no) \

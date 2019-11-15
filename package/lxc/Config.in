@@ -3,7 +3,6 @@ config BR2_PACKAGE_LXC
 	select BR2_PACKAGE_LIBCAP
 	depends on BR2_INET_IPV6
 	depends on BR2_TOOLCHAIN_HAS_THREADS
-	depends on BR2_LARGEFILE
 	depends on BR2_USE_MMU # fork()
 	depends on !BR2_avr32 # no timerfd
 	depends on !BR2_nios2 # the toolchain doesn't support setns syscall
@@ -18,4 +17,4 @@ comment "lxc needs a toolchain w/ IPv6, threads, largefile"
 	depends on BR2_USE_MMU
 	depends on !BR2_avr32 # no timerfd
 	depends on !BR2_nios2 # the toolchain doesn't support setns syscall
-	depends on !BR2_INET_IPV6 || !BR2_TOOLCHAIN_HAS_THREADS || !BR2_LARGEFILE
+	depends on !BR2_INET_IPV6 || !BR2_TOOLCHAIN_HAS_THREADS

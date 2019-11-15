@@ -85,8 +85,7 @@ An example illustrates both the usage of +select+ and +depends on+.
 config BR2_PACKAGE_ACL
         bool "acl"
         select BR2_PACKAGE_ATTR
-        depends on BR2_LARGEFILE
-        help
+                help
           POSIX Access Control Lists, which are used to define more
           fine-grained discretionary access rights for files and
           directories.
@@ -95,8 +94,7 @@ config BR2_PACKAGE_ACL
           http://savannah.nongnu.org/projects/acl
 
 comment "acl needs a toolchain w/ largefile"
-        depends on !BR2_LARGEFILE
---------------------------
+        --------------------------
 
 
 Note that these two dependency types are only transitive with the

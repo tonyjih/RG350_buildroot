@@ -1,5 +1,4 @@
 config BR2_PACKAGE_LIBPLAYER
-	depends on BR2_LARGEFILE
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	bool "libplayer"
 	help
@@ -16,8 +15,7 @@ config BR2_PACKAGE_LIBPLAYER_MPLAYER
 	depends on !(BR2_bfin || BR2_sh2a || BR2_sh4a || BR2_sh4aeb || \
 		   BR2_microblaze || BR2_aarch64 || BR2_nios)
 	# mplayer
-	depends on BR2_LARGEFILE
-	# mplayer
+		# mplayer
 	# Broken support for <ARMv5
 	depends on !(BR2_arm920t || BR2_arm920t || BR2_arm922t || BR2_fa526 \
 		|| BR2_strongarm)
@@ -41,4 +39,4 @@ config BR2_PACKAGE_LIBPLAYER_PYTHON
 endif
 
 comment "libplayer needs a toolchain w/ largefile, threads"
-	depends on !BR2_LARGEFILE || !BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_TOOLCHAIN_HAS_THREADS

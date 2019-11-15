@@ -19,11 +19,11 @@ PPPD_RADIUS_CONF = dictionary dictionary.ascend dictionary.compat \
 
 ifeq ($(BR2_PACKAGE_PPPD_FILTER),y)
 	PPPD_DEPENDENCIES += libpcap
-	PPPD_MAKE_OPT += FILTER=y
+	PPPD_MAKE_OPTS += FILTER=y
 endif
 
 ifeq ($(BR2_INET_IPV6),y)
-	PPPD_MAKE_OPT += HAVE_INET6=y
+	PPPD_MAKE_OPTS += HAVE_INET6=y
 endif
 
 # pppd bundles some but not all of the needed kernel headers. The embedded

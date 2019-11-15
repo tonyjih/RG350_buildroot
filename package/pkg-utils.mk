@@ -5,28 +5,6 @@
 #
 ################################################################################
 
-# UPPERCASE Macro -- transform its argument to uppercase and replace dots and
-# hyphens to underscores
-
-# Heavily inspired by the up macro from gmsl (http://gmsl.sf.net)
-# This is approx 5 times faster than forking a shell and tr, and
-# as this macro is used a lot it matters
-# This works by creating translation character pairs (E.G. a:A b:B)
-# and then looping though all of them running $(subst from,to,text)
-[FROM] := a b c d e f g h i j k l m n o p q r s t u v w x y z - .
-[TO]   := A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ _
-
-define caseconvert-helper
-$(1) = $$(strip \
-	$$(eval __tmp := $$(1))\
-	$(foreach c, $(2),\
-		$$(eval __tmp := $$(subst $(word 1,$(subst :, ,$c)),$(word 2,$(subst :, ,$c)),$$(__tmp))))\
-	$$(__tmp))
-endef
-
-$(eval $(call caseconvert-helper,UPPERCASE,$(join $(addsuffix :,$([FROM])),$([TO]))))
-$(eval $(call caseconvert-helper,LOWERCASE,$(join $(addsuffix :,$([TO])),$([FROM]))))
-
 #
 # Manipulation of .config files based on the Kconfig
 # infrastructure. Used by the BusyBox package, the Linux kernel
@@ -50,14 +28,16 @@ endef
 
 # Helper functions to determine the name of a package and its
 # directory from its makefile directory, using the $(MAKEFILE_LIST)
-# variable provided by make. This is used by the *TARGETS macros to
+# variable provided by make. This is used by the *-package macros to
 # automagically find where the package is located.
-pkgdir       = $(dir $(lastword $(MAKEFILE_LIST)))
-pkgname      = $(lastword $(subst /, ,$(pkgdir)))
+pkgdir = $(dir $(lastword $(MAKEFILE_LIST)))
+pkgname = $(lastword $(subst /, ,$(pkgdir)))
 
 # Define extractors for different archive suffixes
 INFLATE.bz2  = $(BZCAT)
 INFLATE.gz   = $(ZCAT)
+INFLATE.lz   = $(LZCAT)
+INFLATE.lzma = $(XZCAT)
 INFLATE.tbz  = $(BZCAT)
 INFLATE.tbz2 = $(BZCAT)
 INFLATE.tgz  = $(ZCAT)
@@ -66,32 +46,99 @@ INFLATE.tar  = cat
 # suitable-extractor(filename): returns extractor based on suffix
 suitable-extractor = $(INFLATE$(suffix $(1)))
 
-# MESSAGE Macro -- display a message in bold type
-MESSAGE     = echo "$(TERM_BOLD)>>> $($(PKG)_NAME) $($(PKG)_VERSION) $(1)$(TERM_RESET)"
-TERM_BOLD  := $(shell tput smso)
-TERM_RESET := $(shell tput rmso)
+# extractor-dependency(filename): returns extractor for 'filename' if the
+# extractor is a dependency. If we build the extractor return nothing.
+# $(firstword) is used here because the extractor can have arguments, like
+# ZCAT="gzip -d -c", and to check for the dependency we only want 'gzip'.
+extractor-dependency = $(firstword $(INFLATE$(filter-out \
+	$(EXTRACTOR_DEPENDENCY_PRECHECKED_EXTENSIONS),$(suffix $(1)))))
 
-# Utility functions for 'find'
-# findfileclauses(filelist) => -name 'X' -o -name 'Y'
-findfileclauses = $(call notfirstword,$(patsubst %,-o -name '%',$(1)))
-# finddirclauses(base, dirlist) => -path 'base/dirX' -o -path 'base/dirY'
-finddirclauses  = $(call notfirstword,$(patsubst %,-o -path '$(1)/%',$(2)))
-
-# Miscellaneous utility functions
-# notfirstword(wordlist): returns all but the first word in wordlist
-notfirstword = $(wordlist 2,$(words $(1)),$(1))
-
-# Needed for the foreach loops to loop over the list of hooks, so that
-# each hook call is properly separated by a newline.
-define sep
-
-
+# check-deprecated-variable -- throw an error on deprecated variables
+# example:
+#   $(eval $(call check-deprecated-variable,FOO_MAKE_OPT,FOO_MAKE_OPTS))
+define check-deprecated-variable # (deprecated var, new var)
+ifneq ($$(origin $(1)),undefined)
+$$(error Package error: use $(2) instead of $(1). Please fix your .mk file)
+endif
 endef
+
+# $(1): YES or NO
+define yesno-to-bool
+	$(subst NO,false,$(subst YES,true,$(1)))
+endef
+
+# json-info -- return package or filesystem metadata formatted as an entry
+#              of a JSON dictionnary
+# $(1): upper-case package or filesystem name
+define json-info
+	"$($(1)_NAME)": {
+		"type": "$($(1)_TYPE)",
+		$(if $(filter rootfs,$($(1)_TYPE)), \
+			$(call _json-info-fs,$(1)), \
+			$(call _json-info-pkg,$(1)), \
+		)
+	}
+endef
+
+# _json-info-pkg, _json-info-pkg-details, _json-info-fs: private helpers
+# for json-info, above
+define _json-info-pkg
+	$(if $($(1)_IS_VIRTUAL), \
+		"virtual": true$(comma),
+		"virtual": false$(comma)
+		$(call _json-info-pkg-details,$(1)) \
+	)
+	"dependencies": [
+		$(call make-comma-list,$(sort $($(1)_FINAL_ALL_DEPENDENCIES)))
+	],
+	"reverse_dependencies": [
+		$(call make-comma-list,$(sort $($(1)_RDEPENDENCIES)))
+	]
+endef
+
+define _json-info-pkg-details
+	"version": "$($(1)_DL_VERSION)",
+	"licenses": "$($(1)_LICENSE)",
+	"dl_dir": "$($(1)_DL_SUBDIR)",
+	"install_target": $(call yesno-to-bool,$($(1)_INSTALL_TARGET)),
+	"install_staging": $(call yesno-to-bool,$($(1)_INSTALL_STAGING)),
+	"install_images": $(call yesno-to-bool,$($(1)_INSTALL_IMAGES)),
+	"downloads": [
+	$(foreach dl,$(sort $($(1)_ALL_DOWNLOADS)),
+		{
+			"source": "$(notdir $(dl))",
+			"uris": [
+				$(call make-comma-list,
+					$(subst \|,|,
+						$(call DOWNLOAD_URIS,$(dl),$(1))
+					)
+				)
+			]
+		},
+	)
+	],
+endef
+
+define _json-info-fs
+	"dependencies": [
+		$(call make-comma-list,$(sort $($(1)_DEPENDENCIES)))
+	]
+endef
+
+# clean-json -- cleanup pseudo-json into clean json:
+#  - remove commas before closing ] and }
+#  - minify with $(strip)
+clean-json = $(strip \
+	$(subst $(comma)},}, $(subst $(comma)$(space)},$(space)}, \
+	$(subst $(comma)],], $(subst $(comma)$(space)],$(space)], \
+		$(strip $(1)) \
+	)))) \
+)
 
 #
 # legal-info helper functions
 #
-LEGAL_INFO_SEPARATOR="::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+LEGAL_INFO_SEPARATOR = "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
 
 define legal-warning # text
 	echo "WARNING: $(1)" >>$(LEGAL_WARNINGS)
@@ -105,23 +152,26 @@ define legal-warning-nosource # pkg, {local|override}
 	$(call legal-warning-pkg,$(1),sources not saved ($(2) packages not handled))
 endef
 
-define legal-manifest # pkg, version, license, license-files, source, url, {HOST|TARGET}
-	echo '"$(1)","$(2)","$(3)","$(4)","$(5)","$(6)"' >>$(LEGAL_MANIFEST_CSV_$(7))
+define legal-manifest # {HOST|TARGET}, pkg, version, license, license-files, source, url, dependencies
+	echo '"$(2)","$(3)","$(4)","$(5)","$(6)","$(7)","$(8)"' >>$(LEGAL_MANIFEST_CSV_$(1))
 endef
 
-define legal-license-header # pkg, license-file, {HOST|TARGET}
-	printf "$(LEGAL_INFO_SEPARATOR)\n\t$(1):\
-		$(2)\n$(LEGAL_INFO_SEPARATOR)\n\n\n" >>$(LEGAL_LICENSES_TXT_$(3))
+define legal-license-file # pkgname, pkgname-pkgver, pkg-hashfile, filename, file-fullpath, {HOST|TARGET}
+	mkdir -p $(LICENSE_FILES_DIR_$(6))/$(2)/$(dir $(4)) && \
+	{ \
+		support/download/check-hash $(3) $(5) $(4); \
+		case $${?} in (0|3) ;; (*) exit 1;; esac; \
+	} && \
+	cp $(5) $(LICENSE_FILES_DIR_$(6))/$(2)/$(4)
 endef
 
-define legal-license-nofiles # pkg, {HOST|TARGET}
-	$(call legal-license-header,$(1),unknown license file(s),$(2))
-endef
+non-virtual-deps = $(foreach p,$(1),$(if $($(call UPPERCASE,$(p))_IS_VIRTUAL),,$(p)))
 
-define legal-license-file # pkg, filename, file-fullpath, {HOST|TARGET}
-	$(call legal-license-header,$(1),$(2) file,$(4)) && \
-	cat $(3) >>$(LEGAL_LICENSES_TXT_$(4)) && \
-	echo >>$(LEGAL_LICENSES_TXT_$(4)) && \
-	mkdir -p $(LICENSE_FILES_DIR_$(4))/$(1)/$(dir $(2)) && \
-	cp $(3) $(LICENSE_FILES_DIR_$(4))/$(1)/$(2)
-endef
+# Returns the list of recursive dependencies and their licensing terms
+# for the package specified in parameter (in lowercase). If that
+# package is a target package, remove host packages from the list.
+legal-deps = \
+    $(foreach p,\
+        $(filter-out $(if $(1:host-%=),host-%),\
+            $(call non-virtual-deps,\
+                $($(call UPPERCASE,$(1))_FINAL_RECURSIVE_DEPENDENCIES))),$(p) [$($(call UPPERCASE,$(p))_LICENSE)])

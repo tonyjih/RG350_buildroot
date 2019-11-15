@@ -1,6 +1,5 @@
 config BR2_PACKAGE_GVFS
 	bool "gvfs"
-	depends on BR2_LARGEFILE
 	depends on BR2_USE_WCHAR # glib2
 	depends on BR2_USE_MMU # dbus, glib2
 	depends on BR2_TOOLCHAIN_HAS_THREADS # dbus, glib2
@@ -18,4 +17,4 @@ config BR2_PACKAGE_GVFS
 
 comment "gvfs needs a toolchain w/ largefile, wchar, threads"
 	depends on BR2_USE_MMU
-	depends on !BR2_LARGEFILE || !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS

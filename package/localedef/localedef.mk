@@ -12,7 +12,7 @@ LOCALEDEF_SITE    = http://www.pengutronix.de/software/ptxdist/temporary-src
 # the host arch is a 64bit system.
 HOST_LOCALEDEF_CONF_ENV = CONFIG_SITE="no"
 
-HOST_LOCALEDEF_CONF_OPT += \
+HOST_LOCALEDEF_CONF_OPTS += \
 	--prefix=/usr \
 	--with-glibc=./eglibc
 

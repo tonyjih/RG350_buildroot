@@ -12,10 +12,10 @@ LIBQRENCODE_LICENSE = LGPLv2.1+
 LIBQRENCODE_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_LIBQRENCODE_TOOLS),y)
-LIBQRENCODE_CONF_OPT += --with-tools=yes
+LIBQRENCODE_CONF_OPTS += --with-tools=yes
 LIBQRENCODE_DEPENDENCIES += libpng
 else
-LIBQRENCODE_CONF_OPT += --with-tools=no
+LIBQRENCODE_CONF_OPTS += --with-tools=no
 endif
 
 $(eval $(autotools-package))

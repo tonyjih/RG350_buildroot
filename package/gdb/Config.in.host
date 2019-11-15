@@ -24,12 +24,12 @@ choice
 	  Select the version of gdb you wish to use.
 
 	config BR2_GDB_VERSION_6_7_1_AVR32_2_1_5
-		depends on BR2_avr32
+	depends on BR2_avr32
 		bool "gdb 6.7.1-avr32-2.1.5"
 
 	config BR2_GDB_VERSION_7_6
 		bool "gdb 7.6.x"
-		depends on !BR2_powerpc64le
+	depends on !BR2_powerpc64le
 
 	config BR2_GDB_VERSION_7_7
 		bool "gdb 7.7.x"

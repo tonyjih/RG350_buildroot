@@ -16,14 +16,14 @@ HOST_MONO_DEPENDENCIES := host-zlib
 MONO_AUTORECONF := YES
 HOST_MONO_AUTORECONF := YES
 
-MONO_DEFAULT_CONF_OPT := --with-tls=pthread \
+MONO_DEFAULT_CONF_OPTS := --with-tls=pthread \
 	--with-mcs-docs=no --with-sgen=no
 
-HOST_MONO_CONF_OPT := $(MONO_DEFAULT_CONF_OPT) --disable-system-aot \
+HOST_MONO_CONF_OPTS := $(MONO_DEFAULT_CONF_OPT) --disable-system-aot \
 	--with-static_mono=yes --with-shared_mono=no --disable-shared \
 	--disable-mono-debugger --disable-nls --with-profile4=no --with-profile4_5=no
 
-MONO_CONF_OPT := $(MONO_DEFAULT_CONF_OPT) --disable-mcs-build \
+MONO_CONF_OPTS := $(MONO_DEFAULT_CONF_OPT) --disable-mcs-build \
 	--enable-minimal=aot --with-sigaltstack=no \
 	--with-static_mono=no --disable-static
 

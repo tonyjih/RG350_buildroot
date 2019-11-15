@@ -11,7 +11,7 @@ MII_DIAG_SITE    = $(BR2_DEBIAN_MIRROR)/debian/pool/main/m/mii-diag
 MII_DIAG_LICENSE = GPL # No version specified
 MII_DIAG_LICENSE_FILES = mii-diag.c
 
-MII_DIAG_MAKE_OPT = $(TARGET_CONFIGURE_OPTS)
+MII_DIAG_MAKE_OPTS = $(TARGET_CONFIGURE_OPTS)
 
 define MII_DIAG_DEBIAN_PATCHES
 	if [ -d $(@D)/debian/patches ]; then \

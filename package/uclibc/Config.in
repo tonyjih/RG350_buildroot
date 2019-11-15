@@ -15,19 +15,19 @@ choice
 
 	config BR2_UCLIBC_VERSION_0_9_31
 		bool "uClibc 0.9.31.x"
-		depends on BR2_avr32
+	depends on BR2_avr32
 
 	config BR2_UCLIBC_VERSION_0_9_33
 		bool "uClibc 0.9.33.x"
-		depends on !(BR2_arc || BR2_avr32 || BR2_xtensa)
+	depends on !(BR2_arc || BR2_avr32 || BR2_xtensa)
 
 	config BR2_UCLIBC_VERSION_XTENSA_GIT
 		bool "uClibc Git Xtensa"
-		depends on BR2_xtensa
+	depends on BR2_xtensa
 
 	config BR2_UCLIBC_VERSION_SNAPSHOT
 		bool "daily snapshot"
-		depends on !(BR2_arc)
+	depends on !(BR2_arc)
 
 endchoice
 
@@ -58,13 +58,6 @@ config BR2_UCLIBC_CONFIG
 	  file and will specify their config file location with this option.
 	  See also docs/README in this package.
 	  If unsure, use the default.
-
-config BR2_TOOLCHAIN_BUILDROOT_LARGEFILE
-	bool "Enable large file (files > 2 GB) support"
-	select BR2_LARGEFILE
-	help
-	  Enable this option if you want your toolchain to support
-	  files bigger than 2 GB.
 
 config BR2_TOOLCHAIN_BUILDROOT_INET_IPV6
 	bool "Enable IPv6 support"
@@ -112,23 +105,23 @@ choice
 
 	config BR2_PTHREADS
 		bool "linuxthreads"
-		depends on !BR2_bfin
-		depends on !BR2_xtensa
-		select BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_bfin
+	depends on !BR2_xtensa
+	select BR2_TOOLCHAIN_HAS_THREADS
 
 	config BR2_PTHREADS_OLD
 		bool "linuxthreads (stable/old)"
-		select BR2_TOOLCHAIN_HAS_THREADS
+	select BR2_TOOLCHAIN_HAS_THREADS
 
 	config BR2_PTHREADS_NATIVE
 		bool "Native POSIX Threading (NPTL)"
-		select BR2_TOOLCHAIN_HAS_THREADS
-		select BR2_TOOLCHAIN_HAS_THREADS_NPTL
-		depends on !BR2_arc
-		depends on !BR2_avr32
-		depends on !BR2_bfin
-		depends on !BR2_xtensa
-		depends on !BR2_x86_i386
+	select BR2_TOOLCHAIN_HAS_THREADS
+	select BR2_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !BR2_arc
+	depends on !BR2_avr32
+	depends on !BR2_bfin
+	depends on !BR2_xtensa
+	depends on !BR2_x86_i386
 endchoice
 
 config BR2_PTHREAD_DEBUG

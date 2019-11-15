@@ -10,7 +10,7 @@ NANO_SITE = http://www.nano-editor.org/dist/v$(NANO_VERSION_MAJOR)
 NANO_LICENSE = GPLv3+
 NANO_LICENSE_FILES = COPYING
 NANO_MAKE_ENV = CURSES_LIB="-lncurses"
-NANO_CONF_OPT = --without-slang
+NANO_CONF_OPTS = --without-slang
 NANO_CONF_ENV = ac_cv_prog_NCURSESW_CONFIG=false
 NANO_DEPENDENCIES = ncurses
 
@@ -21,7 +21,7 @@ else
 endif
 
 ifeq ($(BR2_PACKAGE_NANO_TINY),y)
-	NANO_CONF_OPT += --enable-tiny
+	NANO_CONF_OPTS += --enable-tiny
 define NANO_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 $(@D)/src/nano $(TARGET_DIR)/usr/bin/nano
 endef

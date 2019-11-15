@@ -4,7 +4,6 @@ config BR2_PACKAGE_UPMPDCLI
 	select BR2_PACKAGE_LIBUPNP
 	select BR2_PACKAGE_LIBMPDCLIENT
 	depends on BR2_INSTALL_LIBSTDCPP
-	depends on BR2_LARGEFILE # libupnp
 	depends on BR2_TOOLCHAIN_HAS_THREADS # libupnp
 	depends on !BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201103 # Too old gcc
 	depends on !BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201009 # Ditto
@@ -19,5 +18,5 @@ config BR2_PACKAGE_UPMPDCLI
 	  http://www.lesbonscomptes.com/upmpdcli/
 
 comment "upmpdcli needs a toolchain w/ C++, largefile, threads"
-	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_LARGEFILE || \
+	depends on !BR2_INSTALL_LIBSTDCPP || \
 		!BR2_TOOLCHAIN_HAS_THREADS

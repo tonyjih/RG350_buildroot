@@ -477,9 +477,6 @@ config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SDL
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SNDFILE
 	bool "sndfile"
 	select BR2_PACKAGE_LIBSNDFILE
-	depends on BR2_LARGEFILE
-
-comment "gst-plugins-bad-plugin-sndfile needs a toolchain w/ largefile"
 
 config BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DVB
 	bool "dvb"

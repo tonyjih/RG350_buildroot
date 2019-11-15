@@ -1,6 +1,5 @@
 config BR2_PACKAGE_QUOTA
 	bool "quota"
-	depends on BR2_LARGEFILE
 	depends on BR2_USE_WCHAR
 	depends on BR2_USE_MMU # fork()
 	depends on !(BR2_microblazeel || BR2_microblazebe) # util-linux
@@ -17,6 +16,6 @@ config BR2_PACKAGE_QUOTA
 
 comment "quota needs a toolchain w/ largefile, wchar, threads"
 	depends on BR2_USE_MMU && !(BR2_microblazeel || BR2_microblazebe)
-	depends on !BR2_LARGEFILE || \
+	depends on \
 		!BR2_USE_WCHAR || \
 		!(BR2_TOOLCHAIN_HAS_THREADS || BR2_TOOLCHAIN_HAS_NATIVE_RPC)
