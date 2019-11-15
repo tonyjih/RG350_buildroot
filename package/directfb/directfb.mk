@@ -4,31 +4,28 @@
 #
 ################################################################################
 
-DIRECTFB_VERSION_MAJOR = 1.6
-DIRECTFB_VERSION = $(DIRECTFB_VERSION_MAJOR).3
+DIRECTFB_VERSION_MAJOR = 1.7
+DIRECTFB_VERSION = $(DIRECTFB_VERSION_MAJOR).7
 DIRECTFB_SITE = http://www.directfb.org/downloads/Core/DirectFB-$(DIRECTFB_VERSION_MAJOR)
 DIRECTFB_SOURCE = DirectFB-$(DIRECTFB_VERSION).tar.gz
-DIRECTFB_LICENSE = LGPLv2.1+
+DIRECTFB_LICENSE = LGPL-2.1+
 DIRECTFB_LICENSE_FILES = COPYING
 DIRECTFB_INSTALL_STAGING = YES
 DIRECTFB_AUTORECONF = YES
 
 DIRECTFB_CONF_OPTS = \
-	--localstatedir=/var \
-	--disable-explicit-deps \
 	--enable-zlib \
 	--enable-freetype \
 	--enable-fbdev \
-	--disable-devmem \
-	--disable-sysfs \
 	--disable-sdl \
 	--disable-vnc \
 	--disable-osx \
 	--disable-video4linux \
 	--disable-video4linux2 \
-	--without-tools
+	--without-tools \
+	--disable-x11
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 DIRECTFB_CONF_OPTS += --disable-dynload
 endif
 
@@ -37,40 +34,43 @@ DIRECTFB_CONFIG_SCRIPTS = directfb-config
 DIRECTFB_DEPENDENCIES = freetype zlib
 
 ifeq ($(BR2_PACKAGE_DIRECTFB_MULTI),y)
-DIRECTFB_CONF_OPTS += --enable-multi --enable-fusion --enable-multi-kernel
+DIRECTFB_CONF_OPTS += --enable-multi --enable-multi-kernel
 DIRECTFB_DEPENDENCIES += linux-fusion
 else
-DIRECTFB_CONF_OPTS += --disable-multi --disable-fusion --disable-multi-kernel
+DIRECTFB_CONF_OPTS += --disable-multi --disable-multi-kernel
 endif
 
+ifeq ($(BR2_PACKAGE_DIRECTFB_DEBUG_SUPPORT),y)
+DIRECTFB_CONF_OPTS += --enable-debug-support
 ifeq ($(BR2_PACKAGE_DIRECTFB_DEBUG),y)
 DIRECTFB_CONF_OPTS += --enable-debug
+endif
+else
+DIRECTFB_CONF_OPTS += --disable-debug-support
 endif
 
 ifeq ($(BR2_PACKAGE_DIRECTFB_TRACE),y)
 DIRECTFB_CONF_OPTS += --enable-trace
 endif
 
-ifeq ($(BR2_PACKAGE_XSERVER),y)
-DIRECTFB_CONF_OPTS += --enable-x11
+ifeq ($(BR2_PACKAGE_DIRECTFB_DIVINE),y)
+DIRECTFB_CONF_OPTS += --enable-divine
 else
-DIRECTFB_CONF_OPTS += --disable-x11
+DIRECTFB_CONF_OPTS += --disable-divine
 endif
 
-ifeq ($(BR2_PACKAGE_DIRECTFB_UNIQUE),y)
-DIRECTFB_CONF_OPTS += --enable-unique
+ifeq ($(BR2_PACKAGE_DIRECTFB_SAWMAN),y)
+DIRECTFB_CONF_OPTS += --enable-sawman
 else
-DIRECTFB_CONF_OPTS += --disable-unique
+DIRECTFB_CONF_OPTS += --disable-sawman
 endif
 
 DIRECTFB_GFX = \
 	$(if $(BR2_PACKAGE_DIRECTFB_ATI128),ati128) \
-	$(if $(BR2_PACKAGE_DIRECTFB_CLE266),cle266) \
 	$(if $(BR2_PACKAGE_DIRECTFB_CYBER5K),cyber5k) \
 	$(if $(BR2_PACKAGE_DIRECTFB_MATROX),matrox) \
 	$(if $(BR2_PACKAGE_DIRECTFB_PXA3XX),pxa3xx) \
-	$(if $(BR2_PACKAGE_DIRECTFB_UNICHROME),unichrome) \
-	$(if $(BR2_PACKAGE_DIRECTFB_I830),i830)	\
+	$(if $(BR2_PACKAGE_DIRECTFB_I830),i830) \
 	$(if $(BR2_PACKAGE_DIRECTFB_EP9X),ep9x)
 
 ifeq ($(strip $(DIRECTFB_GFX)),)
@@ -104,6 +104,13 @@ else
 DIRECTFB_CONF_OPTS += --disable-gif
 endif
 
+ifeq ($(BR2_PACKAGE_DIRECTFB_TIFF),y)
+DIRECTFB_CONF_OPTS += --enable-tiff
+DIRECTFB_DEPENDENCIES += tiff
+else
+DIRECTFB_CONF_OPTS += --disable-tiff
+endif
+
 ifeq ($(BR2_PACKAGE_DIRECTFB_PNG),y)
 DIRECTFB_CONF_OPTS += --enable-png
 DIRECTFB_DEPENDENCIES += libpng
@@ -117,6 +124,15 @@ DIRECTFB_CONF_OPTS += --enable-jpeg
 DIRECTFB_DEPENDENCIES += jpeg
 else
 DIRECTFB_CONF_OPTS += --disable-jpeg
+endif
+
+ifeq ($(BR2_PACKAGE_DIRECTFB_SVG),y)
+DIRECTFB_CONF_OPTS += --enable-svg
+# needs some help to find cairo includes
+DIRECTFB_CONF_ENV += CPPFLAGS="$(TARGET_CPPFLAGS) -I$(STAGING_DIR)/usr/include/cairo"
+DIRECTFB_DEPENDENCIES += libsvg-cairo
+else
+DIRECTFB_CONF_OPTS += --disable-svg
 endif
 
 ifeq ($(BR2_PACKAGE_DIRECTFB_IMLIB2),y)
@@ -137,29 +153,21 @@ ifeq ($(BR2_PACKAGE_DIRECTFB_TESTS),y)
 DIRECTFB_CONF_OPTS += --with-tests
 endif
 
-define DIRECTFB_DELETE_OBJS
-rm -rf $(TARGET_DIR)/usr/lib/directfb-$(DIRECTFB_VERSION_MAJOR)-0/*/*.o \
-	$(TARGET_DIR)/usr/lib/directfb-$(DIRECTFB_VERSION_MAJOR)-0/interfaces/*/*.o
-endef
-
-DIRECTFB_POST_INSTALL_TARGET_HOOKS += DIRECTFB_DELETE_OBJS
-
 HOST_DIRECTFB_DEPENDENCIES = host-pkgconf host-libpng
 HOST_DIRECTFB_CONF_OPTS = \
-		--disable-debug \
-		--disable-multi \
-		--enable-png \
-		--with-gfxdrivers=none \
-		--with-inputdrivers=none
+	--disable-multi \
+	--enable-png \
+	--with-gfxdrivers=none \
+	--with-inputdrivers=none
 
 HOST_DIRECTFB_BUILD_CMDS = \
-	$(MAKE) -C $(@D)/tools directfb-csource
+	$(HOST_MAKE_ENV) $(MAKE) -C $(@D)/tools directfb-csource
 
 HOST_DIRECTFB_INSTALL_CMDS = \
-	$(INSTALL) -m 0755 $(@D)/tools/directfb-csource $(HOST_DIR)/usr/bin
+	$(INSTALL) -m 0755 $(@D)/tools/directfb-csource $(HOST_DIR)/bin
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 
 # directfb-csource for the host
-DIRECTFB_HOST_BINARY = $(HOST_DIR)/usr/bin/directfb-csource
+DIRECTFB_HOST_BINARY = $(HOST_DIR)/bin/directfb-csource
