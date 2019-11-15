@@ -4,16 +4,27 @@
 #
 ################################################################################
 
-LUAPOSIX_VERSION = 32
-LUAPOSIX_SITE = https://github.com/luaposix/luaposix/archive
-LUAPOSIX_SOURCE = release-v$(LUAPOSIX_VERSION).tar.gz
+LUAPOSIX_VERSION = 34.1.1
+LUAPOSIX_SITE = $(call github,luaposix,luaposix,v$(LUAPOSIX_VERSION))
 LUAPOSIX_LICENSE = MIT
-LUAPOSIX_LICENSE_FILES = COPYING
+LUAPOSIX_LICENSE_FILES = LICENSE
 LUAPOSIX_DEPENDENCIES = luainterpreter host-lua
-LUAPOSIX_CONF_OPTS = --libdir="/usr/lib/lua/$(LUAINTERPRETER_ABIVER)" --datarootdir="/usr/share/lua/$(LUAINTERPRETER_ABIVER)"
 
-ifeq ($(BR2_PACKAGE_NCURSES),y)
-    LUAPOSIX_DEPENDENCIES += ncurses
-endif
+define LUAPOSIX_BUILD_CMDS
+	(cd $(@D); \
+		$(LUA_RUN) build-aux/luke \
+		CC="$(TARGET_CC)" \
+		CFLAGS="$(TARGET_CFLAGS)" \
+		LUA_INCDIR=$(STAGING_DIR)/usr/include \
+	)
+endef
 
-$(eval $(autotools-package))
+define LUAPOSIX_INSTALL_TARGET_CMDS
+	(cd $(@D); \
+		$(LUA_RUN) build-aux/luke install \
+		INST_LIBDIR="$(TARGET_DIR)/usr/lib/lua/$(LUAINTERPRETER_ABIVER)" \
+		INST_LUADIR="$(TARGET_DIR)/usr/share/lua/$(LUAINTERPRETER_ABIVER)" \
+	)
+endef
+
+$(eval $(generic-package))
