@@ -5,3 +5,4 @@ config BR2_PACKAGE_DEVIL
 	  A full featured cross-platform image library.
 
 	  http://openil.sourceforge.net/
+	depends on BR2_PACKAGE_HAS_LIBGLES
