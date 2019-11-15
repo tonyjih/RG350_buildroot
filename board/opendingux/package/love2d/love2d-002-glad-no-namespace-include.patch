@@ -1,0 +1,62 @@
+diff --git a/src/libraries/glad/glad.cpp b/src/libraries/glad/glad.cpp
+index d08563b96..9256f12bc 100644
+--- a/src/libraries/glad/glad.cpp
++++ b/src/libraries/glad/glad.cpp
+@@ -3,9 +3,6 @@
+ 
+ #define GLAD_USE_SDL
+ 
+-namespace glad {
+-
+-
+ #ifdef GLAD_USE_SDL
+ #include <SDL.h>
+ #if !SDL_VERSION_ATLEAST(2,0,0)
+@@ -15,6 +12,9 @@ namespace glad {
+ #include <assert.h>
+ #endif
+ 
++namespace glad {
++
++
+ bool gladLoadGL(void) {
+ #ifdef GLAD_USE_SDL
+     return gladLoadGLLoader(SDL_GL_GetProcAddress);
+
+---
+
+diff --git a/src/libraries/glad/glad.hpp b/src/libraries/glad/glad.hpp
+index 3914de5e2..040a0838e 100644
+--- a/src/libraries/glad/glad.hpp
++++ b/src/libraries/glad/glad.hpp
+@@ -59,14 +59,6 @@
+ #define GLAPI extern
+ #endif
+ 
+-namespace glad {
+-
+-bool gladLoadGL(void);
+-
+-typedef void* (* LOADER)(const char *name);
+-bool gladLoadGLLoader(LOADER);
+-
+-
+ #include <stddef.h>
+ #ifndef GLEXT_64_TYPES_DEFINED
+ /* This code block is duplicated in glxext.h, so must be protected */
+@@ -105,6 +97,15 @@ typedef unsigned __int64 uint64_t;
+ #include <inttypes.h>
+ #endif
+ #endif
++
++namespace glad {
++
++bool gladLoadGL(void);
++
++typedef void* (* LOADER)(const char *name);
++bool gladLoadGLLoader(LOADER);
++
++
+ typedef unsigned int GLenum;
+ typedef unsigned char GLboolean;
+ typedef unsigned int GLbitfield;
