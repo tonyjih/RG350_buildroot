@@ -1,0 +1,43 @@
+From 9e17a1736230489bf780dd94e16c6ef9b93563c9 Mon Sep 17 00:00:00 2001
+From: Gleb Mazovetskiy <glex.spb@gmail.com>
+Date: Tue, 17 Dec 2019 12:56:25 +0000
+Subject: [PATCH] Rename mips to mipmaps
+
+---
+ DevIL/src-IL/src/il_devil.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/DevIL/src-IL/src/il_devil.cpp b/DevIL/src-IL/src/il_devil.cpp
+index c9eeb5d..c47a8f1 100644
+--- a/DevIL/src-IL/src/il_devil.cpp
++++ b/DevIL/src-IL/src/il_devil.cpp
+@@ -187,7 +187,7 @@ ILboolean ILAPIENTRY ilTexImageSurface(ILuint Width, ILuint Height, ILuint Depth
+ // Internal version of ilTexImageSurface.
+ ILboolean ILAPIENTRY ilTexImageSurface_(ILimage *Image, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, void *Data)
+ {
+-	ILimage* mips;
++	ILimage* mipmaps;
+ 	ILimage* next;
+ 	ILimage* faces;
+ 	ILimage* layers;
+@@ -220,7 +220,7 @@ ILboolean ILAPIENTRY ilTexImageSurface_(ILimage *Image, ILuint Width, ILuint Hei
+ 	return IL_FALSE;
+ 	}*/
+ 
+-	mips = Image->Mipmaps;
++	mipmaps = Image->Mipmaps;
+ 	next = Image->Next;
+ 	faces = Image->Faces;
+ 	layers = Image->Layers;
+@@ -230,7 +230,7 @@ ILboolean ILAPIENTRY ilTexImageSurface_(ILimage *Image, ILuint Width, ILuint Hei
+ 	retval = ilInitImage(Image, Width, Height, Depth, Bpp, Format, Type, Data);
+ 
+ 	// reset our chains
+-	Image->Mipmaps = mips;
++	Image->Mipmaps = mipmaps;
+ 	Image->Next = next;
+ 	Image->Faces = faces;
+ 	Image->Layers = layers;
+-- 
+2.20.1
+
