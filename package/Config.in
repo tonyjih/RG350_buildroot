@@ -114,6 +114,8 @@ if BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
 	source "package/gawk/Config.in"
 endif
 	source "package/gettext/Config.in"
+	source "package/gettext-gnu/Config.in"
+	source "package/gettext-tiny/Config.in"
 	source "package/git/Config.in"
 	source "package/gperf/Config.in"
 if BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
