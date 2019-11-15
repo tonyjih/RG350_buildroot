@@ -4,24 +4,11 @@
 #
 ################################################################################
 
-UCLIBC_VERSION = $(call qstrip,$(BR2_UCLIBC_VERSION_STRING))
-UCLIBC_SOURCE ?= uClibc-$(UCLIBC_VERSION).tar.bz2
-UCLIBC_LICENSE = LGPLv2.1+
+UCLIBC_VERSION = 1.0.32
+UCLIBC_SOURCE = uClibc-ng-$(UCLIBC_VERSION).tar.xz
+UCLIBC_SITE = https://downloads.uclibc-ng.org/releases/$(UCLIBC_VERSION)
+UCLIBC_LICENSE = LGPL-2.1+
 UCLIBC_LICENSE_FILES = COPYING.LIB
-
-ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
-UCLIBC_SITE = http://www.uclibc.org/downloads/snapshots
-else ifeq ($(BR2_arc),y)
-UCLIBC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,uClibc,$(UCLIBC_VERSION))
-UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.gz
-else ifeq ($(BR2_UCLIBC_VERSION_XTENSA_GIT),y)
-UCLIBC_SITE = git://git.busybox.net/uClibc
-UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.gz
-else
-UCLIBC_SITE = http://www.uclibc.org/downloads
-UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.xz
-endif
-
 UCLIBC_INSTALL_STAGING = YES
 
 define UCLIBC_HELP_CMDS
@@ -468,4 +455,3 @@ endif
 endif
 
 $(eval $(kconfig-package))
-
