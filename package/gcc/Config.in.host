@@ -31,6 +31,7 @@ choice
 		depends on !BR2_ARM_FPU_VFPV4 && !BR2_ARM_FPU_VFPV4D16
 		# musl patches only for gcc 4.7+
 		depends on !BR2_TOOLCHAIN_BUILDROOT_MUSL
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_4
 
 	config BR2_GCC_VERSION_4_5_X
 		depends on !BR2_microblaze && !BR2_aarch64 && !BR2_arc && !BR2_avr32 && !BR2_cortex_a7 && !BR2_cortex_a12 && !BR2_cortex_a15 && !BR2_x86_corei7 && !BR2_x86_jaguar && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8 && !BR2_fa526 && !BR2_pj4 && !BR2_powerpc64le
@@ -40,22 +41,26 @@ choice
 		# musl patches only for gcc 4.7+
 		depends on !BR2_TOOLCHAIN_BUILDROOT_MUSL
 		bool "gcc 4.5.x"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_5
 
 	config BR2_GCC_VERSION_4_7_X
 		depends on !BR2_microblaze && !BR2_aarch64 && !BR2_arc && !BR2_avr32 && !BR2_bfin && !BR2_cortex_a12 && !BR2_x86_jaguar && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8 && !BR2_pj4 && !BR2_powerpc64le
 		select BR2_GCC_NEEDS_MPC
 		bool "gcc 4.7.x"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_7
 
 	config BR2_GCC_VERSION_4_8_X
 		depends on !BR2_microblaze && !BR2_arc && !BR2_avr32 && !BR2_bfin && !BR2_cortex_a12 && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8 && !BR2_powerpc64le && !BR2_sparc
 		select BR2_GCC_NEEDS_MPC
 		select BR2_GCC_SUPPORTS_GRAPHITE
 		bool "gcc 4.8.x"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_8
 
 	config BR2_GCC_VERSION_4_8_ARC
 		depends on BR2_arc
 		select BR2_GCC_NEEDS_MPC
 		bool "gcc 4.8-arc"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_8
 
 	config BR2_GCC_VERSION_4_9_X
 		depends on !BR2_arc && !BR2_avr32 && !BR2_bfin && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8 && !BR2_sparc
@@ -63,6 +68,7 @@ choice
 		select BR2_GCC_NEEDS_MPC
 		select BR2_GCC_SUPPORTS_GRAPHITE
 		bool "gcc 4.9.x"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_9
 
 	config BR2_GCC_VERSION_SNAP
 		depends on !BR2_arc && !BR2_avr32 && !BR2_sparc_sparchfleon && !BR2_sparc_sparchfleonv8 && !BR2_sparc_sparcsfleon && !BR2_sparc_sparcsfleonv8 && !BR2_sparc
@@ -71,6 +77,7 @@ choice
 		depends on !BR2_TOOLCHAIN_BUILDROOT_MUSL
 		select BR2_GCC_SUPPORTS_GRAPHITE
 		bool "gcc snapshot"
+    select BR2_TOOLCHAIN_GCC_AT_LEAST_4_9
 endchoice
 
 config BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE
