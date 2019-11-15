@@ -309,9 +309,6 @@ endmenu
 	source "package/dbus-glib/Config.in"
 	source "package/dbus-python/Config.in"
 	source "package/dbus-triggerd/Config.in"
-if BR2_PACKAGE_BUSYBOX_SHOW_OTHERS
-	source "package/devmem2/Config.in"
-endif
 	source "package/dmidecode/Config.in"
 	source "package/dmraid/Config.in"
 	source "package/dvb-apps/Config.in"
