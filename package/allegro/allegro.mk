@@ -7,7 +7,7 @@
 ALLEGRO_VERSION = 4.4.2
 ALLEGRO_SITE = http://downloads.sourceforge.net/project/alleg/allegro/$(ALLEGRO_VERSION)
 ALLEGRO_INSTALL_STAGING = YES
-ALLEGRO_DEPENDENCIES += alsa-lib zlib libpng libogg libvorbis
+ALLEGRO_DEPENDENCIES += alsa-lib zlib libpng libogg libvorbis libegl
 
 ALLEGRO_CONF_OPTS += -DWANT_LINUX_CONSOLE=ON -DWANT_LINUX_FBCON=ON \
 					-DWANT_OSS=OFF -DWANT_LINUX_VGA=OFF \
