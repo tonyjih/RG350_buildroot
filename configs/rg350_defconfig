@@ -17,6 +17,7 @@ BR2_GDB_VERSION_8_3=y
 BR2_ROOTFS_SKELETON_CUSTOM=y
 BR2_ROOTFS_SKELETON_CUSTOM_PATH="board/opendingux/gcw0/target_skeleton"
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
+BR2_ROOTFS_DEVICE_TABLE="board/opendingux/device_table.txt"
 BR2_TARGET_TZ_INFO=y
 BR2_ROOTFS_POST_BUILD_SCRIPT="board/opendingux/gcw0/post-build-script.sh"
 BR2_LINUX_KERNEL=y
