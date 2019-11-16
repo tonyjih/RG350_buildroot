@@ -29,7 +29,8 @@ config BR2_PACKAGE_LIBFOO
 	depends on BR2_PACKAGE_LIBBAZ
 	select BR2_PACKAGE_LIBBAR
 	help
-	  This is a comment that explains what libfoo is.
+	  This is a comment that explains what libfoo is. The help text
+	  should be wrapped.
 
 	  http://foosoftware.org/libfoo/
 ---------------------
@@ -39,6 +40,9 @@ config BR2_PACKAGE_LIBFOO
 
 * The help text itself should be indented with one tab and two
   spaces.
+
+* The help text should be wrapped to fit 72 columns, where tab counts
+  for 8, so 62 characters in the text itself.
 
 The +Config.in+ files are the input for the configuration tool
 used in Buildroot, which is the regular _Kconfig_. For further
@@ -65,7 +69,7 @@ blank line is mandatory after the header:
 +
 ---------------------
 LIBFOO_VERSION = 1.0
-LIBFOO_CONF_OPT += --without-python-support
+LIBFOO_CONF_OPTS += --without-python-support
 ---------------------
 +
 Do not align the +=+ signs.
@@ -90,17 +94,17 @@ YES:
 +
 ---------------------
 ifeq ($(BR2_PACKAGE_PYTHON),y)
-LIBFOO_CONF_OPT += --with-python-support
+LIBFOO_CONF_OPTS += --with-python-support
 LIBFOO_DEPENDENCIES += python
 else
-LIBFOO_CONF_OPT += --without-python-support
+LIBFOO_CONF_OPTS += --without-python-support
 endif
 ---------------------
 +
 NO:
 +
 ---------------------
-LIBFOO_CONF_OPT += --with$(if $(BR2_PACKAGE_PYTHON),,out)-python-support
+LIBFOO_CONF_OPTS += --with$(if $(BR2_PACKAGE_PYTHON),,out)-python-support
 LIBFOO_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON),python,)
 ---------------------
 
@@ -139,3 +143,9 @@ http://www.methods.co.nz/asciidoc/[asciidoc] format.
 
 For further details about the http://www.methods.co.nz/asciidoc/[asciidoc]
 syntax, refer to http://www.methods.co.nz/asciidoc/userguide.html[].
+
+=== Support scripts
+
+Some scripts in the +support/+ and +utils/+ directories are written in
+Python and should follow the
+https://www.python.org/dev/peps/pep-0008/[PEP8 Style Guide for Python Code].

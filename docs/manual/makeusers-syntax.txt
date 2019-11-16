@@ -1,7 +1,8 @@
 // -*- mode:doc -*- ;
+// vim: set syntax=asciidoc:
 
 [[makeuser-syntax]]
-== Makeuser syntax documentation
+== Makeusers syntax documentation
 
 The syntax to create users is inspired by the makedev syntax, above, but
 is specific to Buildroot.
@@ -16,7 +17,8 @@ user per line; the fields are:
 Where:
 
 - +username+ is the desired user name (aka login name) for the user.
-  It can not be +root+, and must be unique.
+  It can not be +root+, and must be unique. If set to +-+, then just a
+  group will be created.
 - +uid+ is the desired UID for the user. It must be unique, and not
   +0+. If set to +-1+, then a unique UID will be computed by Buildroot
   in the range [1000...1999]
@@ -29,7 +31,8 @@ Where:
   then login is disabled. If prefixed with +=+, then it is interpreted
   as clear-text, and will be crypt-encoded (using MD5). If prefixed with
   +!=+, then the password will be crypt-encoded (using MD5) and login
-  will be disabled. If set to +*+, then login is not allowed.
+  will be disabled. If set to +*+, then login is not allowed. If set to 
+  +-+, then no password value will be set.
 - +home+ is the desired home directory for the user. If set to '-', no
   home directory will be created, and the user's home will be +/+.
   Explicitly setting +home+ to +/+ is not allowed.
