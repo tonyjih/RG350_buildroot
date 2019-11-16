@@ -1,5 +1,5 @@
-config BR2_PACKAGE_HOST_GENPART
-	bool "host genpart"
+config BR2_PACKAGE_GENPART
+	bool "genpart"
 	help
 	  Generate a 16 byte partition table entry defined by command
 	  line arguments and dump it to stdout. No CHS magic is done,
