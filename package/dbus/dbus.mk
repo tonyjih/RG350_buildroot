@@ -34,7 +34,7 @@ define DBUS_USERS
 	dbus -1 dbus -1 * /var/run/dbus - dbus DBus messagebus user
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 DBUS_CONF_OPTS += LIBS='-pthread'
 endif
 

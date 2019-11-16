@@ -605,7 +605,7 @@ endmenu
 endif
 	source "package/php/Config.in"
 if BR2_PACKAGE_PHP
-if !BR2_PREFER_STATIC_LIB
+if !BR2_STATIC_LIBS
 menu "External php extensions"
 	source "package/php-geoip/Config.in"
 	source "package/php-gnupg/Config.in"
@@ -616,7 +616,7 @@ menu "External php extensions"
 	source "package/php-zmq/Config.in"
 endmenu
 endif
-if BR2_PREFER_STATIC_LIB
+if BR2_STATIC_LIBS
 comment "External PHP extensions need a toolchain w/ dynamic library"
 endif
 endif

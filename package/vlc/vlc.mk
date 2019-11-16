@@ -45,7 +45,7 @@ VLC_CONF_OPTS += \
 	--disable-opencv
 
 # Building static and shared doesn't work, so force static off.
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 VLC_CONF_OPTS += --disable-static
 endif
 
@@ -226,7 +226,7 @@ endif
 
 # live555 installs a static library only, and vlc tries to link it into a
 # shared library - which doesn't work. So only enable live555 if static.
-ifeq ($(BR2_PACKAGE_LIVE555)$(BR2_PREFER_STATIC_LIB),yy)
+ifeq ($(BR2_PACKAGE_LIVE555)$(BR2_STATIC_LIBS),yy)
 VLC_CONF_OPTS += --enable-live555
 VLC_DEPENDENCIES += live555
 VLC_CONF_ENV += \

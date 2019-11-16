@@ -69,7 +69,7 @@ else
 GST_FFMPEG_CONF_EXTRA_OPT += --disable-altivec
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 GST_FFMPEG_CONF_EXTRA_OPT += --enable-pic
 endif
 
