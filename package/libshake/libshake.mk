@@ -3,13 +3,13 @@
 # libshake
 #
 #############################################################
-LIBSHAKE_VERSION = patch-1
-LIBSHAKE_SITE = $(call github,glebm,libShake,$(LIBSHAKE_VERSION))
+LIBSHAKE_VERSION = master
+LIBSHAKE_SITE = $(call github,zear,libShake,$(LIBSHAKE_VERSION))
 LIBSHAKE_LICENSE = MIT
 LIBSHAKE_LICENSE_FILES = LICENSE.txt
 LIBSHAKE_INSTALL_STAGING = YES
 
-LIBSHAKE_MAKE_ENV =	PLATFORM=$(BR2_PACKAGE_LIBSHAKE_PLATFORM) \
+LIBSHAKE_MAKE_ENV =	BACKEND=LINUX \
 					AR="$(TARGET_AR)" CC="$(TARGET_CC)" \
 					LD="$(TARGET_CC)" STRIP="$(TARGET_STRIP)" \
 					PREFIX=/usr
