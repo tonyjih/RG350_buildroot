@@ -3,7 +3,7 @@
 ## hocoslamfy
 #
 #################################################################################
-HOCOSLAMFY_VERSION = f60f367938321f0bd5cf355c5721905bc5c41812
+HOCOSLAMFY_VERSION = rg350
 HOCOSLAMFY_SITE = $(call github,jamesofarrell,hocoslamfy,$(HOCOSLAMFY_VERSION))
 HOCOSLAMFY_AUTORECONF = YES
 HOCOSLAMFY_INSTALL_STAGING = YES
