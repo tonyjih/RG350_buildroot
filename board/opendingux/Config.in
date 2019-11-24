@@ -1,14 +1,25 @@
 menu "OpenDingux packages"
-	source "$BR2_EXTERNAL/package/allegro/Config.in"
+comment "Emulators"
+	source "$BR2_EXTERNAL/package/pcsx4all/Config.in"
+	source "$BR2_EXTERNAL/package/pocketsnes/Config.in"
+
+comment "Frontend"
 	source "$BR2_EXTERNAL/package/gmenu2x/Config.in"
 	source "$BR2_EXTERNAL/package/gmenunx/Config.in"
+
+comment "Games"
 	source "$BR2_EXTERNAL/package/gng/Config.in"
 	source "$BR2_EXTERNAL/package/hocoslamfy/Config.in"
+
+comment "Librariess"
+	source "$BR2_EXTERNAL/package/allegro/Config.in"
 	source "$BR2_EXTERNAL/package/libini/Config.in"
 	source "$BR2_EXTERNAL/package/libopk/Config.in"
 	source "$BR2_EXTERNAL/package/libshake/Config.in"
 	source "$BR2_EXTERNAL/package/libxdgmime/Config.in"
 	source "$BR2_EXTERNAL/package/love2d/Config.in"
+
+comment "System tools"
 	source "$BR2_EXTERNAL/package/od-network-config/Config.in"
 	source "$BR2_EXTERNAL/package/pwswd/Config.in"
 endmenu
