@@ -4,7 +4,7 @@
 #
 #############################################################
 
-OD_NETWORK_CONFIG_SITE = package/od-network-config
+OD_NETWORK_CONFIG_SITE = $(BR2_EXTERNAL)/package/od-network-config
 OD_NETWORK_CONFIG_SITE_METHOD = local
 
 OD_NETWORK_CONFIG_DEPENDENCIES = python-pygame
