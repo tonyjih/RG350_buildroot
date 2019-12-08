@@ -12,7 +12,7 @@ NCURSES_LICENSE = MIT with advertising clause
 NCURSES_LICENSE_FILES = COPYING
 NCURSES_CONFIG_SCRIPTS = ncurses$(NCURSES_LIB_SUFFIX)6-config
 
-NCURSES_CONF_OPTS = \
+NCURSES_CONF_OPT = \
 	--without-cxx \
 	--without-cxx-binding \
 	--without-ada \
@@ -31,19 +31,19 @@ NCURSES_CONF_OPTS = \
 	--without-manpages
 
 ifeq ($(BR2_STATIC_LIBS),y)
-NCURSES_CONF_OPTS += --without-shared --with-normal
+NCURSES_CONF_OPT += --without-shared --with-normal
 else ifeq ($(BR2_SHARED_LIBS),y)
-NCURSES_CONF_OPTS += --with-shared --without-normal
+NCURSES_CONF_OPT += --with-shared --without-normal
 else ifeq ($(BR2_SHARED_STATIC_LIBS),y)
-NCURSES_CONF_OPTS += --with-shared --with-normal
+NCURSES_CONF_OPT += --with-shared --with-normal
 endif
 
 # configure can't find the soname for libgpm when cross compiling
 ifeq ($(BR2_PACKAGE_GPM),y)
-NCURSES_CONF_OPTS += --with-gpm=libgpm.so.2
+NCURSES_CONF_OPT += --with-gpm=libgpm.so.2
 NCURSES_DEPENDENCIES += gpm
 else
-NCURSES_CONF_OPTS += --without-gpm
+NCURSES_CONF_OPT += --without-gpm
 endif
 
 NCURSES_TERMINFO_FILES = \
@@ -68,7 +68,7 @@ NCURSES_TERMINFO_FILES = \
 	$(call qstrip,$(BR2_PACKAGE_NCURSES_ADDITIONAL_TERMINFO))
 
 ifeq ($(BR2_PACKAGE_NCURSES_WCHAR),y)
-NCURSES_CONF_OPTS += --enable-widec
+NCURSES_CONF_OPT += --enable-widec
 NCURSES_LIB_SUFFIX = w
 NCURSES_LIBS = ncurses menu panel form
 
@@ -101,7 +101,7 @@ NCURSES_LINK_STAGING_LIBS = \
 
 NCURSES_LINK_STAGING_PC = $(call NCURSES_LINK_PC)
 
-NCURSES_CONF_OPTS += --enable-ext-colors
+NCURSES_CONF_OPT += --enable-ext-colors
 
 NCURSES_POST_INSTALL_STAGING_HOOKS += NCURSES_LINK_STAGING_LIBS
 NCURSES_POST_INSTALL_STAGING_HOOKS += NCURSES_LINK_STAGING_PC
@@ -109,7 +109,7 @@ NCURSES_POST_INSTALL_STAGING_HOOKS += NCURSES_LINK_STAGING_PC
 endif # BR2_PACKAGE_NCURSES_WCHAR
 
 ifneq ($(BR2_ENABLE_DEBUG),y)
-NCURSES_CONF_OPTS += --without-debug
+NCURSES_CONF_OPT += --without-debug
 endif
 
 # ncurses breaks with parallel build, but takes quite a while to
@@ -146,7 +146,7 @@ define HOST_NCURSES_BUILD_CMDS
 	$(HOST_MAKE_ENV) $(MAKE) -C $(@D)/progs tic
 endef
 
-HOST_NCURSES_CONF_OPTS = \
+HOST_NCURSES_CONF_OPT = \
 	--with-shared \
 	--without-gpm \
 	--without-manpages \
