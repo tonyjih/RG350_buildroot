@@ -13,9 +13,9 @@ HTOP_LICENSE = GPL-2.0
 HTOP_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_NCURSES_WCHAR),y)
-HTOP_CONF_OPTS += --enable-unicode
+HTOP_CONF_OPT += --enable-unicode
 else
-HTOP_CONF_OPTS += --disable-unicode
+HTOP_CONF_OPT += --disable-unicode
 endif
 
 # ARC uses an old uClibc that needs dladdr() for backtrace support,
