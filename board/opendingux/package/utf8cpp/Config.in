@@ -1,0 +1,6 @@
+config BR2_PACKAGE_UTF8CPP
+	bool "utf8cpp"
+	help
+	  UTF-8 with C++ in a Portable Way
+	
+	  https://github.com/nemtrif/utfcpp

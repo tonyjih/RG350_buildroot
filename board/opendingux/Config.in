@@ -8,6 +8,7 @@ comment "Frontends"
 	source "$BR2_EXTERNAL/package/gmenunx/Config.in"
 
 comment "Games"
+	source "$BR2_EXTERNAL/package/blockattack/Config.in"
 	source "$BR2_EXTERNAL/package/gng/Config.in"
 	source "$BR2_EXTERNAL/package/hocoslamfy/Config.in"
 
@@ -18,6 +19,7 @@ comment "Libraries"
 	source "$BR2_EXTERNAL/package/libshake/Config.in"
 	source "$BR2_EXTERNAL/package/libxdgmime/Config.in"
 	source "$BR2_EXTERNAL/package/love2d/Config.in"
+	source "$BR2_EXTERNAL/package/utf8cpp/Config.in"
 
 comment "System tools"
 	source "$BR2_EXTERNAL/package/od-network-config/Config.in"

@@ -1,0 +1,17 @@
+config BR2_PACKAGE_BLOCKATTACK
+	bool "blockattack"
+	select BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_IMAGE
+	select BR2_PACKAGE_SDL2_MIXER
+	select BR2_PACKAGE_SDL2_TTF
+	select BR2_PACKAGE_PHYSFS
+	select BR2_PACKAGE_UTF8CPP
+	select BR2_PACKAGE_GETTEXT
+	help
+	  Block Attack - Rise of the Blocks
+	
+	  A Tetris Attack Clone under the GPL.
+
+	  https://blockattack.net/
