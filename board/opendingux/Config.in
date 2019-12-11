@@ -16,6 +16,7 @@ comment "Libraries"
 	source "$BR2_EXTERNAL/package/libini/Config.in"
 	source "$BR2_EXTERNAL/package/libopk/Config.in"
 	source "$BR2_EXTERNAL/package/libshake/Config.in"
+	source "$BR2_EXTERNAL/package/libshake1/Config.in"
 	source "$BR2_EXTERNAL/package/libxdgmime/Config.in"
 	source "$BR2_EXTERNAL/package/love2d/Config.in"
 

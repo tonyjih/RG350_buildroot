@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBSHAKE1
+	bool "libshake1"
+	help
+	  An older version of libshake.
+	  Build for compatibility with older OPKs.
+
+	  https://github.com/zear/libShake
