@@ -3,7 +3,7 @@
 # libshake
 #
 #############################################################
-LIBSHAKE_VERSION = 32174c6
+LIBSHAKE_VERSION = master
 LIBSHAKE_SITE = $(call github,zear,libShake,$(LIBSHAKE_VERSION))
 LIBSHAKE_LICENSE = MIT
 LIBSHAKE_LICENSE_FILES = LICENSE.txt
@@ -21,6 +21,8 @@ endef
 
 define LIBSHAKE_INSTALL_TARGET_CMDS
 	$(LIBSHAKE_MAKE_ENV) DESTDIR="$(TARGET_DIR)" $(MAKE) -C $(@D) install-lib
+	# libshake.so.1 symlink for backwards compatibility with existing OPKs
+	ln -sf "$(TARGET_DIR)/usr/lib/libshake.so.2" "$(TARGET_DIR)/usr/lib/libshake.so.1"
 endef
 
 $(eval $(generic-package))
