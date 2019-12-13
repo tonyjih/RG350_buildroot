@@ -6,7 +6,7 @@ config BR2_PACKAGE_POCKETSNES
 	select BR2_PACKAGE_SDL_TTF
 	help
 	  PocketSNES emulator package
-	  https://github.com/pingflood/PocketSNES
+	  https://github.com/soarqin/PocketSNES
 
 if BR2_PACKAGE_POCKETSNES
 
