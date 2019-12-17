@@ -70,33 +70,21 @@ endif
 
 # Retrieve the archive
 $(BUILD_DIR)/%/.stamp_downloaded:
+	@$(call step_start,download)
+	$(call prepare-per-package-directory,$($(PKG)_FINAL_DOWNLOAD_DEPENDENCIES))
 	$(foreach hook,$($(PKG)_PRE_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
-ifeq ($(DL_MODE),DOWNLOAD)
 # Only show the download message if it isn't already downloaded
-	$(Q)if test ! -e $(DL_DIR)/$($(PKG)_SOURCE); then \
-		$(call MESSAGE,"Downloading") ; \
-	else \
-		for p in $($(PKG)_PATCH) ; do \
-			if test ! -e $(DL_DIR)/$$p ; then \
-				$(call MESSAGE,"Downloading") ; \
-				break ; \
-			fi ; \
-		done ; \
-	fi
-endif
-	$(if $($(PKG)_SOURCE),$(call DOWNLOAD,$($(PKG)_SITE:/=)/$($(PKG)_SOURCE)))
-	$(foreach p,$($(PKG)_EXTRA_DOWNLOADS),$(call DOWNLOAD,$($(PKG)_SITE:/=)/$(p))$(sep))
-	$(foreach p,$($(PKG)_PATCH),\
-		$(if $(findstring ://,$(p)),\
-			$(call DOWNLOAD,$(p)),\
-			$(call DOWNLOAD,$($(PKG)_SITE:/=)/$(p))\
-		)\
-	$(sep))
+	$(Q)for p in $($(PKG)_ALL_DOWNLOADS); do \
+		if test ! -e $($(PKG)_DL_DIR)/`basename $$p` ; then \
+			$(call MESSAGE,"Downloading") ; \
+			break ; \
+		fi ; \
+	done
+	$(foreach p,$($(PKG)_ALL_DOWNLOADS),$(call DOWNLOAD,$(p),$(PKG))$(sep))
 	$(foreach hook,$($(PKG)_POST_DOWNLOAD_HOOKS),$(call $(hook))$(sep))
-ifeq ($(DL_MODE),DOWNLOAD)
 	$(Q)mkdir -p $(@D)
+	@$(call step_end,download)
 	$(Q)touch $@
-endif
 
 # Unpack the archive
 $(BUILD_DIR)/%/.stamp_extracted:
@@ -310,6 +298,7 @@ define inner-generic-package
 $(2)_TYPE                       =  $(4)
 $(2)_NAME			=  $(1)
 $(2)_RAWNAME			=  $$(patsubst host-%,%,$(1))
+$(2)_PKGDIR			=  $(pkgdir)
 
 # Keep the package version that may contain forward slashes in the _DL_VERSION
 # variable, then replace all forward slashes ('/') by underscores ('_') to
@@ -317,27 +306,39 @@ $(2)_RAWNAME			=  $$(patsubst host-%,%,$(1))
 # Forward slashes may appear in the package's version when pointing to a
 # version control system branch or tag, for example remotes/origin/1_10_stable.
 ifndef $(2)_VERSION
- ifdef $(3)_VERSION
+ ifdef $(3)_DL_VERSION
+  $(2)_DL_VERSION := $$($(3)_DL_VERSION)
+ else ifdef $(3)_VERSION
   $(2)_DL_VERSION := $$($(3)_VERSION)
-  $(2)_VERSION := $$(subst /,_,$$($(3)_VERSION))
- else
-  $(2)_VERSION = undefined
-  $(2)_DL_VERSION = undefined
  endif
 else
-  $(2)_DL_VERSION := $$($(2)_VERSION)
-  $(2)_VERSION := $$(subst /,_,$$($(2)_VERSION))
+ $(2)_DL_VERSION := $$(strip $$($(2)_VERSION))
+endif
+$(2)_VERSION := $$(call sanitize,$$($(2)_DL_VERSION))
+
+ifdef $(3)_OVERRIDE_SRCDIR
+  $(2)_OVERRIDE_SRCDIR ?= $$($(3)_OVERRIDE_SRCDIR)
 endif
 
-$(2)_BASE_NAME	=  $(1)-$$($(2)_VERSION)
-$(2)_DL_DIR	=  $$(DL_DIR)/$$($(2)_BASE_NAME)
-$(2)_DIR	=  $$(BUILD_DIR)/$$($(2)_BASE_NAME)
+$(2)_BASENAME	= $$(if $$($(2)_VERSION),$(1)-$$($(2)_VERSION),$(1))
+$(2)_BASENAME_RAW = $$(if $$($(2)_VERSION),$$($(2)_RAWNAME)-$$($(2)_VERSION),$$($(2)_RAWNAME))
+$(2)_DL_SUBDIR ?= $$($(2)_RAWNAME)
+$(2)_DL_DIR = $$(DL_DIR)/$$($(2)_DL_SUBDIR)
+$(2)_DIR	=  $$(BUILD_DIR)/$$($(2)_BASENAME)
 
 ifndef $(2)_SUBDIR
  ifdef $(3)_SUBDIR
   $(2)_SUBDIR = $$($(3)_SUBDIR)
  else
   $(2)_SUBDIR ?=
+ endif
+endif
+
+ifndef $(2)_STRIP_COMPONENTS
+ ifdef $(3)_STRIP_COMPONENTS
+  $(2)_STRIP_COMPONENTS = $$($(3)_STRIP_COMPONENTS)
+ else
+  $(2)_STRIP_COMPONENTS ?= 1
  endif
 endif
 
@@ -351,16 +352,30 @@ endif
 ifndef $(2)_SOURCE
  ifdef $(3)_SOURCE
   $(2)_SOURCE = $$($(3)_SOURCE)
- else
-  $(2)_SOURCE			?= $$($(2)_RAWNAME)-$$($(2)_VERSION).tar.gz
+ else ifdef $(2)_VERSION
+  $(2)_SOURCE			?= $$($(2)_BASENAME_RAW).tar.gz
  endif
 endif
+
+# If FOO_ACTUAL_SOURCE_TARBALL is explicitly defined, it means FOO_SOURCE is
+# indeed a binary (e.g. external toolchain) and FOO_ACTUAL_SOURCE_TARBALL/_SITE
+# point to the actual sources tarball. Use the actual sources for legal-info.
+# For most packages the FOO_SITE/FOO_SOURCE pair points to real source code,
+# so these are the defaults for FOO_ACTUAL_*.
+$(2)_ACTUAL_SOURCE_TARBALL ?= $$($(2)_SOURCE)
+$(2)_ACTUAL_SOURCE_SITE    ?= $$(call qstrip,$$($(2)_SITE))
 
 ifndef $(2)_PATCH
  ifdef $(3)_PATCH
   $(2)_PATCH = $$($(3)_PATCH)
  endif
 endif
+
+$(2)_ALL_DOWNLOADS = \
+	$$(if $$($(2)_SOURCE),$$($(2)_SITE_METHOD)+$$($(2)_SITE)/$$($(2)_SOURCE)) \
+	$$(foreach p,$$($(2)_PATCH) $$($(2)_EXTRA_DOWNLOADS),\
+		$$(if $$(findstring ://,$$(p)),$$(p),\
+			$$($(2)_SITE_METHOD)+$$($(2)_SITE)/$$(p)))
 
 ifndef $(2)_SITE
  ifdef $(3)_SITE
@@ -377,9 +392,30 @@ ifndef $(2)_SITE_METHOD
  endif
 endif
 
+ifndef $(2)_DL_OPTS
+ ifdef $(3)_DL_OPTS
+  $(2)_DL_OPTS = $$($(3)_DL_OPTS)
+ endif
+endif
+
+ifneq ($$(filter bzr cvs hg svn,$$($(2)_SITE_METHOD)),)
+BR_NO_CHECK_HASH_FOR += $$($(2)_SOURCE)
+endif
+
+# Do not accept to download git submodule if not using the git method
+ifneq ($$($(2)_GIT_SUBMODULES),)
+ ifneq ($$($(2)_SITE_METHOD),git)
+  $$(error $(2) declares having git sub-modules, but does not use the \
+	   'git' method (uses '$$($(2)_SITE_METHOD)' instead))
+ endif
+endif
+
 ifeq ($$($(2)_SITE_METHOD),local)
 ifeq ($$($(2)_OVERRIDE_SRCDIR),)
 $(2)_OVERRIDE_SRCDIR = $$($(2)_SITE)
+endif
+ifeq ($$($(2)_OVERRIDE_SRCDIR),)
+$$(error $(1) has local site method, but `$(2)_SITE` is not defined)
 endif
 endif
 
@@ -404,6 +440,8 @@ ifndef $(2)_REDISTRIBUTE
 endif
 
 $(2)_REDISTRIBUTE		?= YES
+
+$(2)_REDIST_SOURCES_DIR = $$(REDIST_SOURCES_DIR_$$(call UPPERCASE,$(4)))/$$($(2)_BASENAME_RAW)
 
 # When a target package is a toolchain dependency set this variable to
 # 'NO' so the 'toolchain' dependency is not added to prevent a circular
@@ -443,8 +481,11 @@ $(2)_TARGET_DIRCLEAN =		$$($(2)_DIR)/.stamp_dircleaned
 
 # default extract command
 $(2)_EXTRACT_CMDS ?= \
-	$$(if $$($(2)_SOURCE),$$(INFLATE$$(suffix $$($(2)_SOURCE))) $$(DL_DIR)/$$($(2)_SOURCE) | \
-	$$(TAR) $$(TAR_STRIP_COMPONENTS)=1 -C $$($(2)_DIR) $$(TAR_OPTIONS) -)
+	$$(if $$($(2)_SOURCE),$$(INFLATE$$(suffix $$($(2)_SOURCE))) $$($(2)_DL_DIR)/$$($(2)_SOURCE) | \
+	$$(TAR) --strip-components=$$($(2)_STRIP_COMPONENTS) \
+		-C $$($(2)_DIR) \
+		$$(foreach x,$$($(2)_EXCLUDES),--exclude='$$(x)' ) \
+		$$(TAR_OPTIONS) -)
 
 # pre/post-steps hooks
 $(2)_PRE_DOWNLOAD_HOOKS         ?=

@@ -5,28 +5,6 @@
 #
 ################################################################################
 
-# UPPERCASE Macro -- transform its argument to uppercase and replace dots and
-# hyphens to underscores
-
-# Heavily inspired by the up macro from gmsl (http://gmsl.sf.net)
-# This is approx 5 times faster than forking a shell and tr, and
-# as this macro is used a lot it matters
-# This works by creating translation character pairs (E.G. a:A b:B)
-# and then looping though all of them running $(subst from,to,text)
-[FROM] := a b c d e f g h i j k l m n o p q r s t u v w x y z - .
-[TO]   := A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ _
-
-define caseconvert-helper
-$(1) = $$(strip \
-	$$(eval __tmp := $$(1))\
-	$(foreach c, $(2),\
-		$$(eval __tmp := $$(subst $(word 1,$(subst :, ,$c)),$(word 2,$(subst :, ,$c)),$$(__tmp))))\
-	$$(__tmp))
-endef
-
-$(eval $(call caseconvert-helper,UPPERCASE,$(join $(addsuffix :,$([FROM])),$([TO]))))
-$(eval $(call caseconvert-helper,LOWERCASE,$(join $(addsuffix :,$([TO])),$([FROM]))))
-
 #
 # Manipulation of .config files based on the Kconfig
 # infrastructure. Used by the BusyBox package, the Linux kernel
@@ -65,28 +43,6 @@ INFLATE.xz   = $(XZCAT)
 INFLATE.tar  = cat
 # suitable-extractor(filename): returns extractor based on suffix
 suitable-extractor = $(INFLATE$(suffix $(1)))
-
-# MESSAGE Macro -- display a message in bold type
-MESSAGE     = echo "$(TERM_BOLD)>>> $($(PKG)_NAME) $($(PKG)_VERSION) $(1)$(TERM_RESET)"
-TERM_BOLD  := $(shell tput smso)
-TERM_RESET := $(shell tput rmso)
-
-# Utility functions for 'find'
-# findfileclauses(filelist) => -name 'X' -o -name 'Y'
-findfileclauses = $(call notfirstword,$(patsubst %,-o -name '%',$(1)))
-# finddirclauses(base, dirlist) => -path 'base/dirX' -o -path 'base/dirY'
-finddirclauses  = $(call notfirstword,$(patsubst %,-o -path '$(1)/%',$(2)))
-
-# Miscellaneous utility functions
-# notfirstword(wordlist): returns all but the first word in wordlist
-notfirstword = $(wordlist 2,$(words $(1)),$(1))
-
-# Needed for the foreach loops to loop over the list of hooks, so that
-# each hook call is properly separated by a newline.
-define sep
-
-
-endef
 
 #
 # legal-info helper functions
