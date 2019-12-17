@@ -48,7 +48,7 @@ copy_toolchain_lib_root = \
 	ARCH_LIB_DIR="$(strip $3)" ; \
 	LIB="$(strip $4)"; \
 	DESTDIR="$(strip $5)" ; \
- \
+\
 	for dir in \
 		$${ARCH_SYSROOT_DIR}/$${ARCH_LIB_DIR}/$(TOOLCHAIN_EXTERNAL_PREFIX) \
 		$${ARCH_SYSROOT_DIR}/usr/$(TOOLCHAIN_EXTERNAL_PREFIX)/$${ARCH_LIB_DIR} \
@@ -79,9 +79,7 @@ copy_toolchain_lib_root = \
 			fi ; \
 			LIBPATH="`readlink -f $${LIBPATH}`"; \
 		done; \
-	done; \
- \
-	echo -n
+	done
 
 #
 # Copy the full external toolchain sysroot directory to the staging
@@ -139,7 +137,7 @@ copy_toolchain_sysroot = \
 	SUPPORT_LIB_DIR="$(strip $5)" ; \
 	for i in etc $${ARCH_LIB_DIR} sbin usr usr/$${ARCH_LIB_DIR}; do \
 		if [ -d $${ARCH_SYSROOT_DIR}/$$i ] ; then \
-			rsync -au --chmod=Du+w --exclude 'usr/lib/locale' \
+			rsync -au --chmod=u=rwX,go=rX --exclude 'usr/lib/locale' \
 				--exclude lib --exclude lib32 --exclude lib64 \
 				$${ARCH_SYSROOT_DIR}/$$i/ $(STAGING_DIR)/$$i/ ; \
 		fi ; \
@@ -150,7 +148,7 @@ copy_toolchain_sysroot = \
 		fi ; \
 		mkdir -p `dirname $(STAGING_DIR)/$${ARCH_SUBDIR}` ; \
 		relpath="./" ; \
-		nbslashs=`echo -n $${ARCH_SUBDIR} | sed 's%[^/]%%g' | wc -c` ; \
+		nbslashs=`printf $${ARCH_SUBDIR} | sed 's%[^/]%%g' | wc -c` ; \
 		for slash in `seq 1 $${nbslashs}` ; do \
 			relpath=$${relpath}"../" ; \
 		done ; \
@@ -172,6 +170,36 @@ copy_toolchain_sysroot = \
 check_kernel_headers_version = \
 	if ! support/scripts/check-kernel-headers.sh $(1) $(2); then \
 		exit 1; \
+	fi
+
+#
+# Check the specific gcc version actually matches the version in the
+# toolchain
+#
+# $1: path to gcc
+# $2: expected gcc version
+#
+# Some details about the sed expression:
+# - 1!d
+#   - delete if not line 1
+#
+# - s/^[^)]+\) ([^[:space:]]+).*/\1/
+#   - eat all until the first ')' character followed by a space
+#   - match as many non-space chars as possible
+#   - eat all the remaining chars on the line
+#   - replace by the matched expression
+#
+check_gcc_version = \
+	expected_version="$(strip $2)" ; \
+	if [ -z "$${expected_version}" ]; then \
+		printf "Internal error, gcc version unknown (no GCC_AT_LEAST_X_Y selected)\n"; \
+		exit 1 ; \
+	fi; \
+	real_version=`$(1) --version | sed -r -e '1!d; s/^[^)]+\) ([^[:space:]]+).*/\1/;'` ; \
+	if [[ ! "$${real_version}" =~ ^$${expected_version}\. ]] ; then \
+		printf "Incorrect selection of gcc version: expected %s.x, got %s\n" \
+			"$${expected_version}" "$${real_version}" ; \
+		exit 1 ; \
 	fi
 
 #
@@ -197,11 +225,11 @@ check_glibc_feature = \
 check_glibc_rpc_feature = \
 	IS_IN_LIBC=`test -f $(1)/usr/include/rpc/rpc.h && echo y` ; \
 	if [ "$(BR2_TOOLCHAIN_HAS_NATIVE_RPC)" != "y" -a "$${IS_IN_LIBC}" = "y" ] ; then \
-		echo "RPC support available in C library, please enable BR2_TOOLCHAIN_HAS_NATIVE_RPC" ; \
+		echo "RPC support available in C library, please enable BR2_TOOLCHAIN_EXTERNAL_INET_RPC" ; \
 		exit 1 ; \
 	fi ; \
 	if [ "$(BR2_TOOLCHAIN_HAS_NATIVE_RPC)" = "y" -a "$${IS_IN_LIBC}" != "y" ] ; then \
-		echo "RPC support not available in C library, please disable BR2_TOOLCHAIN_HAS_NATIVE_RPC" ; \
+		echo "RPC support not available in C library, please disable BR2_TOOLCHAIN_EXTERNAL_INET_RPC" ; \
 		exit 1 ; \
 	fi
 
@@ -239,6 +267,9 @@ check_musl = \
 # uClibc configuration of the external toolchain, for a particular
 # feature.
 #
+# If 'Buildroot option name' ($2) is empty it means the uClibc option
+# is mandatory.
+#
 # $1: uClibc macro name
 # $2: Buildroot option name
 # $3: uClibc config file
@@ -246,13 +277,20 @@ check_musl = \
 #
 check_uclibc_feature = \
 	IS_IN_LIBC=`grep -q "\#define $(1) 1" $(3) && echo y` ; \
-	if [ "$($(2))" != "y" -a "$${IS_IN_LIBC}" = "y" ] ; then \
-		echo "$(4) available in C library, please enable $(2)" ; \
-		exit 1 ; \
-	fi ; \
-	if [ "$($(2))" = "y" -a "$${IS_IN_LIBC}" != "y" ] ; then \
-		echo "$(4) not available in C library, please disable $(2)" ; \
-		exit 1 ; \
+	if [ -z "$(2)" ] ; then \
+		if [ "$${IS_IN_LIBC}" != "y" ] ; then \
+			echo "$(4) not available in C library, toolchain unsuitable for Buildroot" ; \
+			exit 1 ; \
+		fi ; \
+	else \
+		if [ "$($(2))" != "y" -a "$${IS_IN_LIBC}" = "y" ] ; then \
+			echo "$(4) available in C library, please enable $(2)" ; \
+			exit 1 ; \
+		fi ; \
+		if [ "$($(2))" = "y" -a "$${IS_IN_LIBC}" != "y" ] ; then \
+			echo "$(4) not available in C library, please disable $(2)" ; \
+			exit 1 ; \
+		fi ; \
 	fi
 
 #
@@ -273,8 +311,8 @@ check_uclibc = \
 	fi; \
 	UCLIBC_CONFIG_FILE=$${SYSROOT_DIR}/usr/include/bits/uClibc_config.h ; \
 	$(call check_uclibc_feature,__ARCH_USE_MMU__,BR2_USE_MMU,$${UCLIBC_CONFIG_FILE},MMU support) ;\
-	$(call check_uclibc_feature,__UCLIBC_HAS_LFS__,BR2_LARGEFILE,$${UCLIBC_CONFIG_FILE},Large file support) ;\
-	$(call check_uclibc_feature,__UCLIBC_HAS_IPV6__,BR2_INET_IPV6,$${UCLIBC_CONFIG_FILE},IPv6 support) ;\
+	$(call check_uclibc_feature,__UCLIBC_HAS_LFS__,,$${UCLIBC_CONFIG_FILE},Large file support) ;\
+	$(call check_uclibc_feature,__UCLIBC_HAS_IPV6__,,$${UCLIBC_CONFIG_FILE},IPv6 support) ;\
 	$(call check_uclibc_feature,__UCLIBC_HAS_RPC__,BR2_TOOLCHAIN_HAS_NATIVE_RPC,$${UCLIBC_CONFIG_FILE},RPC support) ;\
 	$(call check_uclibc_feature,__UCLIBC_HAS_LOCALE__,BR2_ENABLE_LOCALE,$${UCLIBC_CONFIG_FILE},Locale support) ;\
 	$(call check_uclibc_feature,__UCLIBC_HAS_WCHAR__,BR2_USE_WCHAR,$${UCLIBC_CONFIG_FILE},Wide char support) ;\
@@ -298,12 +336,14 @@ check_arm_abi = \
 		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - ; then \
+	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o $(BUILD_DIR)/.br-toolchain-test.tmp - ; then \
+		rm -f $(BUILD_DIR)/.br-toolchain-test.tmp*; \
 		abistr_$(BR2_ARM_EABI)='EABI'; \
 		abistr_$(BR2_ARM_EABIHF)='EABIhf'; \
 		echo "Incorrect ABI setting: $${abistr_y} selected, but toolchain is incompatible"; \
 		exit 1 ; \
-	fi
+	fi ; \
+	rm -f $(BUILD_DIR)/.br-toolchain-test.tmp*
 
 #
 # Check that the external toolchain supports C++
@@ -347,6 +387,14 @@ check_unusable_toolchain = \
 		echo "them unsuitable as external toolchains for build systems" ; \
 		echo "such as Buildroot." ; \
 		exit 1 ; \
+	fi; \
+	with_sysroot=`$${__CROSS_CC} -v 2>&1 |sed -r -e '/.* --with-sysroot=([^[:space:]]+)[[:space:]].*/!d; s//\1/'`; \
+	if test "$${with_sysroot}"  = "/" ; then \
+		echo "Distribution toolchains are unsuitable for use by Buildroot," ; \
+		echo "as they were configured in a way that makes them non-relocatable,"; \
+		echo "and contain a lot of pre-built libraries that would conflict with"; \
+		echo "the ones Buildroot wants to build."; \
+		exit 1; \
 	fi
 
 #
