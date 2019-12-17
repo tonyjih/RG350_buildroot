@@ -1,0 +1,21 @@
+diff --git a/gdb/dwarf-index-write.c b/gdb/dwarf-index-write.c
+index d2831461ca..03269cbefe 100644
+--- a/gdb/dwarf-index-write.c
++++ b/gdb/dwarf-index-write.c
+@@ -35,6 +35,7 @@
+ 
+ #include <algorithm>
+ #include <cmath>
++#include <math.h>
+ #include <set>
+ #include <unordered_map>
+ #include <unordered_set>
+@@ -705,7 +706,7 @@ public:
+     gdb_assert (m_abbrev_table.empty ());
+     const size_t name_count = m_name_to_value_set.size ();
+     m_bucket_table.resize
+-      (std::pow (2, std::ceil (std::log2 (name_count * 4 / 3))));
++      (std::pow (2, std::ceil (log2 (name_count * 4 / 3))));
+     m_hash_table.reserve (name_count);
+     m_name_table_string_offs.reserve (name_count);
+     m_name_table_entry_offs.reserve (name_count);
