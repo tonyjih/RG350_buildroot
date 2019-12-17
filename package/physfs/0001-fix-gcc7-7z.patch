@@ -1,0 +1,16 @@
+Fix compilation error with GCC 7
+
+physfs-2.0.3/lzma/C/Archive/7z/7zIn.c:1139:16: error: ‘dataStartPos’ may be used uninitialised in this function [-Werror=maybe-uninitialized]
+   dataStartPos += baseOffset;
+
+--- a/lzma/C/Archive/7z/7zIn.c
++++ b/lzma/C/Archive/7z/7zIn.c
+@@ -1123,7 +1123,7 @@
+ {
+ 
+   UInt32 numUnPackStreams = 0;
+-  CFileSize dataStartPos;
++  CFileSize dataStartPos = 0;
+   CFolder *folder;
+   #ifndef _LZMA_IN_CB
+   CFileSize packSize = 0;
