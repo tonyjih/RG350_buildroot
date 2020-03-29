@@ -23,6 +23,7 @@ CMAKE_LICENSE_FILES = Copyright.txt
 #   linking with the ones bundled into the CMake sources.
 
 CMAKE_DEPENDENCIES = zlib jsoncpp libcurl libarchive expat bzip2 xz libuv rhash
+HOST_CMAKE_DEPENDENCIES =
 
 CMAKE_CONF_OPTS = \
 	-DKWSYS_LFS_WORKS=TRUE \
