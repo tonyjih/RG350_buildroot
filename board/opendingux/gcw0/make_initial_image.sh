@@ -1,50 +1,46 @@
 #!/bin/sh
 
-KERNEL=output/images/vmlinuz.bin
-ROOTFS=output/images/rootfs.squashfs
-MODULES=output/images/modules.squashfs
-MININIT=output/images/mininit-syspart
+# Builds a full SD card image
+#
+# If you want the localpack apps included in the image, run this first:
+# board/opendingux/gcw0/download_local_pack.sh
 
-make mininit
+set -e
 
-# create sha1sums
-for f in "$KERNEL" "$ROOTFS" "$MODULES" "$MININIT"; do
-	sha1sum -b "$f" | cut -d' ' -f1 > "$f.sha1"
-done
+make world mininit host-od-imager
 
-cp -f $KERNEL output/images/vmlinuz.bak
-cp -f $KERNEL.sha1 output/images/vmlinuz.bak.sha1
-cp -f $MODULES $MODULES.bak
-cp -f $MODULES.sha1 $MODULES.bak.sha1
-
-# remove previous packages
-rm -rf output/images/boot.vfat
-rm -rf output/images/apps.ext4
-rm -rf output/images/sdcard.img
-
-# Copy OPKs
-mkdir -p output/images/apps_partition/apps/
-if [ -d output/images/local_pack/ ]; then
-	cp output/images/local_pack/*.opk output/images/apps_partition/apps/
+# Data image (OPKs):
+cd output/images
+mkdir -p od-imager/apps/
+rm od-imager/apps/* || true
+if [ -d ../../dl/od_local_pack/ ]; then
+	cp ../../dl/od_local_pack/*.opk od-imager/apps/
 fi
-cp output/images/opks/*.opk output/images/apps_partition/apps/
+cp opks/*.opk od-imager/apps/
 
-# Clear output/images-tmp
-rm -rf output/images-tmp
+# System image
+cp mininit-syspart od-imager/
+cp vmlinuz.bin od-imager/
+cp modules.squashfs od-imager/
+cp rootfs.squashfs od-imager/
+# Fallbacks are empty as this is the initial image.
+echo -n > od-imager/vmlinuz.bak
+echo -n > od-imager/modules.squashfs.bak
 
-# Empty rootfs
-rm -rf output/genimage-empty-root
-mkdir output/genimage-empty-root
+# Bootloader
+cp ubiboot/ubiboot-rg350.bin od-imager/ubiboot.bin
+cd -
 
-# Build sdcard.img from board/opendingux/gcw0/genimage.cfg
-output/host/usr/bin/genimage \
-	    --config board/opendingux/gcw0/genimage.cfg \
-	    --rootpath output/genimage-empty-root \
-	    --inputpath output/images \
-	    --outputpath output/images \
-	    --tmppath output/images-tmp
+# Assemble partitions and the final image
+cd output/images/od-imager/
+./create_mbr.sh
+./create_system_image.sh
+./create_data_image.sh
+./assemble_images.sh
+cd -
 
-# Clear output/images-tmp
-rm -rf output/images-tmp
-
-
+echo
+echo 'SD card image created in:'
+echo output/images/od-imager/images/sd_image.bin
+echo Size:
+du -sh output/images/od-imager/images/sd_image.bin
