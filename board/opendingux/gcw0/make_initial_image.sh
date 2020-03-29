@@ -3,18 +3,19 @@
 KERNEL=output/images/vmlinuz.bin
 ROOTFS=output/images/rootfs.squashfs
 MODULES=output/images/modules.squashfs
+MININIT=output/images/mininit-syspart
+
+make mininit
 
 # create sha1sums
-sha1sum -b "$KERNEL" | cut -d' ' -f1 > "$KERNEL.sha1"
-sha1sum -b "$ROOTFS" | cut -d' ' -f1 > "$ROOTFS.sha1"
-sha1sum -b "$MODULES" | cut -d' ' -f1 > "$MODULES.sha1"
+for f in "$KERNEL" "$ROOTFS" "$MODULES" "$MININIT"; do
+	sha1sum -b "$f" | cut -d' ' -f1 > "$f.sha1"
+done
 
 cp -f $KERNEL output/images/vmlinuz.bak
 cp -f $KERNEL.sha1 output/images/vmlinuz.bak.sha1
 cp -f $MODULES $MODULES.bak
 cp -f $MODULES.sha1 $MODULES.bak.sha1
-
-board/opendingux/gcw0/build_mininit.sh
 
 # remove previous packages
 rm -rf output/images/boot.vfat
