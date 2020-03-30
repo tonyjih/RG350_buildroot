@@ -1,0 +1,27 @@
+From c877eab53d0caf6f5742caeeaa935a569995fd5c Mon Sep 17 00:00:00 2001
+From: Gleb Mazovetskiy <glex.spb@gmail.com>
+Date: Mon, 30 Mar 2020 03:13:01 +0100
+Subject: [PATCH] Fix mips/callNative.s on GCC 5+
+
+See https://lists.debian.org/debian-mips/2015/12/msg00012.html
+---
+ src/os/linux/mips/callNative.S | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/os/linux/mips/callNative.S b/src/os/linux/mips/callNative.S
+index cede343..8538604 100644
+--- a/src/os/linux/mips/callNative.S
++++ b/src/os/linux/mips/callNative.S
+@@ -157,8 +157,7 @@ ret_float:
+ 
+ ret_double:
+ #ifdef __mips_hard_float
+-	swc1 $f0,0($8)
+-	swc1 $f1,4($8)
++	sdc1 $f0,0($8)
+ 	addu $8,8
+ 	j return
+ #endif
+-- 
+2.20.1
+
