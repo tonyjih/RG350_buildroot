@@ -286,7 +286,7 @@ FFMPEG_CONF_OPTS += \
 	--enable-mipsfpu
 endif
 
-ifeq ($(BR2_mips_32r2),y)
+ifeq ($(BR2_mips_32r2)$(BR2_mips_xburst),y)
 FFMPEG_CONF_OPTS += \
 	--enable-mips32r2
 else
@@ -330,7 +330,7 @@ define FFMPEG_CONFIGURE_CMDS
 		--arch=$(BR2_ARCH) \
 		--target-os="linux" \
 		--disable-stripping \
-		$(if $(BR2_GCC_TARGET_TUNE),--cpu=$(BR2_GCC_TARGET_TUNE)) \
+		$(if $(GCC_TARGET_CPU),--cpu=$(GCC_TARGET_CPU)) \
 		$(SHARED_STATIC_LIBS_OPTS) \
 		$(FFMPEG_CONF_OPTS) \
 	)
