@@ -134,7 +134,7 @@ else
 AVAHI_CONF_OPTS += --disable-python
 endif
 
-AVAHI_MAKE_OPT += $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)
+AVAHI_MAKE_OPTS += $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),LIBS=-lintl)
 
 define AVAHI_USERS
 	avahi -1 avahi -1 * - - -

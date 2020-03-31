@@ -245,7 +245,7 @@ HOST_GCC_COMMON_TOOLCHAIN_WRAPPER_ARGS += -DBR_CROSS_PATH_SUFFIX='".br_real"'
 # For gcc-final, the gcc logic to detect whether SSP support is
 # available or not in the C library is not working properly for
 # uClibc, so let's be explicit as well.
-HOST_GCC_COMMON_MAKE_OPT = \
+HOST_GCC_COMMON_MAKE_OPTS = \
 	gcc_cv_libc_provides_ssp=$(if $(BR2_TOOLCHAIN_HAS_SSP),yes,no)
 
 ifeq ($(BR2_CCACHE),y)
