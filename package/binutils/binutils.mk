@@ -67,10 +67,10 @@ endif
 # and sometimes needs specific makeinfo versions to work
 BINUTILS_CONF_ENV += MAKEINFO=true
 BINUTILS_MAKE_OPT += MAKEINFO=true
-BINUTILS_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) MAKEINFO=true install
+BINUTILS_INSTALL_TARGET_OPTS = DESTDIR=$(TARGET_DIR) MAKEINFO=true install
 HOST_BINUTILS_CONF_ENV += MAKEINFO=true
 HOST_BINUTILS_MAKE_OPT += MAKEINFO=true
-HOST_BINUTILS_INSTALL_OPT += MAKEINFO=true install
+HOST_BINUTILS_INSTALL_OPTS += MAKEINFO=true install
 
 # Workaround a build issue with -Os for ARM Cortex-M cpus.
 # (Binutils 2.25.1 and 2.26.1)
