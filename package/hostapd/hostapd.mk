@@ -5,7 +5,7 @@
 ################################################################################
 
 HOSTAPD_VERSION = 2.8
-HOSTAPD_SITE =  https://w1.fi/releases/
+HOSTAPD_SITE =  https://w1.fi/releases
 HOSTAPD_SUBDIR = hostapd
 HOSTAPD_CONFIG = $(HOSTAPD_DIR)/$(HOSTAPD_SUBDIR)/.config
 HOSTAPD_DEPENDENCIES = libnl
