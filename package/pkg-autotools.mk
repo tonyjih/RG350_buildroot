@@ -96,11 +96,11 @@ ifndef $(2)_GETTEXTIZE
 endif
 
 ifeq ($(4),host)
- $(2)_GETTEXTIZE_OPT ?= $$($(3)_GETTEXTIZE_OPT)
+ $(2)_GETTEXTIZE_OPTS ?= $$($(3)_GETTEXTIZE_OPTS)
 endif
 
 ifeq ($(4),host)
- $(2)_AUTORECONF_OPT ?= $$($(3)_AUTORECONF_OPT)
+ $(2)_AUTORECONF_OPTS ?= $$($(3)_AUTORECONF_OPTS)
 endif
 
 $(2)_CONF_ENV			?=
@@ -214,7 +214,7 @@ endef
 #
 define GETTEXTIZE_HOOK
 	@$$(call MESSAGE,"Gettextizing")
-	$(Q)cd $$($$(PKG)_SRCDIR) && $$(GETTEXTIZE) $$($$(PKG)_GETTEXTIZE_OPT)
+	$(Q)cd $$($$(PKG)_SRCDIR) && $$(GETTEXTIZE) $$($$(PKG)_GETTEXTIZE_OPTS)
 endef
 
 #
@@ -222,7 +222,7 @@ endef
 #
 define AUTORECONF_HOOK
 	@$$(call MESSAGE,"Autoreconfiguring")
-	$$(Q)cd $$($$(PKG)_SRCDIR) && $$($$(PKG)_AUTORECONF_ENV) $$(AUTORECONF) $$($$(PKG)_AUTORECONF_OPT)
+	$$(Q)cd $$($$(PKG)_SRCDIR) && $$($$(PKG)_AUTORECONF_ENV) $$(AUTORECONF) $$($$(PKG)_AUTORECONF_OPTS)
 endef
 
 # This must be repeated from inner-generic-package, otherwise we get an empty
