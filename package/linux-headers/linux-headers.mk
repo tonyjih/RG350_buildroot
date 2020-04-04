@@ -54,8 +54,10 @@ endef
 ifeq ($(BR2_KERNEL_HEADERS_VERSION),y)
 define LINUX_HEADERS_CHECK_VERSION
 	$(call check_kernel_headers_version,\
+		$(BUILD_DIR),\
 		$(STAGING_DIR),\
-		$(call qstrip,$(BR2_TOOLCHAIN_HEADERS_AT_LEAST)))
+		$(call qstrip,$(BR2_TOOLCHAIN_HEADERS_AT_LEAST)),\
+		loose)
 endef
 LINUX_HEADERS_POST_INSTALL_STAGING_HOOKS += LINUX_HEADERS_CHECK_VERSION
 endif

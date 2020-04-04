@@ -381,17 +381,15 @@ ifneq ($(BR2_DEPRECATED),y)
 include Makefile.legacy
 endif
 
+include system/system.mk
 include package/Makefile.in
 # arch/arch.mk must be after package/Makefile.in because it may need to
 # complement variables defined therein, like BR_NO_CHECK_HASH_FOR.
 include arch/arch.mk
 include support/dependencies/dependencies.mk
 
-# We also need the various per-package makefiles, which also add
-# each selected package to PACKAGES if that package was selected
-# in the .config file.
-include toolchain/*.mk
-include toolchain/*/*.mk
+include $(sort $(wildcard toolchain/*.mk))
+include $(sort $(wildcard toolchain/*/*.mk))
 
 # Include the package override file if one has been provided in the
 # configuration.
@@ -404,7 +402,6 @@ include $(sort $(wildcard package/*/*.mk))
 
 include boot/common.mk
 include linux/linux.mk
-include system/system.mk
 include fs/common.mk
 
 include $(BR2_EXTERNAL)/external.mk
@@ -841,13 +838,21 @@ ifeq ($(NEED_WRAPPER),y)
 	$(Q)$(TOPDIR)/support/scripts/mkmakefile $(TOPDIR) $(O)
 endif
 
-# printvars prints all the variables currently defined in our Makefiles
+# printvars prints all the variables currently defined in our
+# Makefiles. Alternatively, if a non-empty VARS variable is passed,
+# only the variables matching the make pattern passed in VARS are
+# displayed.
+.PHONY: printvars
 printvars:
-	@$(foreach V, \
-		$(sort $(.VARIABLES)), \
+	@:
+	$(foreach V, \
+		$(sort $(filter $(VARS),$(.VARIABLES))), \
 		$(if $(filter-out environment% default automatic, \
 				$(origin $V)), \
-		$(info $V=$($V) ($(value $V)))))
+		$(if $(QUOTED_VARS),\
+			$(info $V='$(subst ','\'',$(if $(RAW_VARS),$(value $V),$($V)))'), \
+			$(info $V=$(if $(RAW_VARS),$(value $V),$($V))))))
+# ' Syntax colouring...
 
 clean:
 	rm -rf $(TARGET_DIR) $(BINARIES_DIR) $(HOST_DIR) \
