@@ -140,7 +140,7 @@ define $(2)_CONFIGURE_CMDS
 		--disable-documentation \
 		--with-xmlto=no \
 		--with-fop=no \
-		$$(DISABLE_NLS) \
+		$$(NLS_OPTS) \
 		$$(DISABLE_LARGEFILE) \
 		$$(DISABLE_IPV6) \
 		$$(SHARED_STATIC_LIBS_OPTS) \
