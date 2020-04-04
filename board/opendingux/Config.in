@@ -28,5 +28,6 @@ comment "System tools"
 
 comment "Hardware handling"
 	source "$BR2_EXTERNAL/package/lowpowd/Config.in"
+	source "$BR2_EXTERNAL/package/unlockvt/Config.in"
 
 endmenu

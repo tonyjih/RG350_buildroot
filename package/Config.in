@@ -225,7 +225,6 @@ endif
 	source "package/sdl2_net/Config.in"
 	source "package/sdl2_ttf/Config.in"
 	source "package/timidity-instruments/Config.in"
-	source "package/unlockvt/Config.in"
 
 comment "Other GUIs"
 	source "package/efl/Config.in"
