@@ -1,6 +1,13 @@
 menu "Target packages"
 
 	source "package/busybox/Config.in"
+	source "package/skeleton/Config.in"
+	source "package/skeleton-custom/Config.in"
+	source "package/skeleton-init-common/Config.in"
+	source "package/skeleton-init-none/Config.in"
+	source "package/skeleton-init-openrc/Config.in"
+	source "package/skeleton-init-systemd/Config.in"
+	source "package/skeleton-init-sysv/Config.in"
 
 menu "Audio and video applications"
 	source "package/alsa-utils/Config.in"
@@ -225,7 +232,6 @@ endif
 	source "package/sdl2_net/Config.in"
 	source "package/sdl2_ttf/Config.in"
 	source "package/timidity-instruments/Config.in"
-	source "package/unlockvt/Config.in"
 
 comment "Other GUIs"
 	source "package/efl/Config.in"
@@ -341,7 +347,6 @@ endif
 	source "package/lcdproc/Config.in"
 	source "package/linux-console-tools/Config.in"
 	source "package/lm-sensors/Config.in"
-	source "package/lowpowd/Config.in"
 	source "package/lshw/Config.in"
 	source "package/lsuio/Config.in"
 	source "package/lvm2/Config.in"

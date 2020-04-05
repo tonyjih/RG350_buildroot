@@ -25,4 +25,9 @@ comment "System tools"
 	source "$BR2_EXTERNAL/package/dingux-commander/Config.in"
 	source "$BR2_EXTERNAL/package/od-network-config/Config.in"
 	source "$BR2_EXTERNAL/package/pwswd/Config.in"
+
+comment "Hardware handling"
+	source "$BR2_EXTERNAL/package/lowpowd/Config.in"
+	source "$BR2_EXTERNAL/package/unlockvt/Config.in"
+
 endmenu

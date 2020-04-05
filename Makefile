@@ -310,7 +310,7 @@ unexport TERMINFO
 
 GNU_HOST_NAME := $(shell support/gnuconfig/config.guess)
 
-TARGETS :=
+PACKAGES :=
 
 # silent mode requested?
 QUIET := $(if $(findstring s,$(MAKEFLAGS)),-q)
@@ -342,8 +342,6 @@ HOST_DIR := $(call qstrip,$(BR2_HOST_DIR))
 
 # Quotes are needed for spaces and all in the original PATH content.
 BR_PATH = "$(HOST_DIR)/bin:$(HOST_DIR)/sbin:$(HOST_DIR)/usr/bin:$(HOST_DIR)/usr/sbin:$(PATH)"
-
-TARGET_SKELETON = $(TOPDIR)/system/skeleton
 
 # Location of a file giving a big fat warning that output/target
 # should not be used as the root filesystem.
@@ -381,17 +379,15 @@ ifneq ($(BR2_DEPRECATED),y)
 include Makefile.legacy
 endif
 
+include system/system.mk
 include package/Makefile.in
 # arch/arch.mk must be after package/Makefile.in because it may need to
 # complement variables defined therein, like BR_NO_CHECK_HASH_FOR.
 include arch/arch.mk
 include support/dependencies/dependencies.mk
 
-# We also need the various per-package makefiles, which also add
-# each selected package to TARGETS if that package was selected
-# in the .config file.
-include toolchain/*.mk
-include toolchain/*/*.mk
+include $(sort $(wildcard toolchain/*.mk))
+include $(sort $(wildcard toolchain/*/*.mk))
 
 # Include the package override file if one has been provided in the
 # configuration.
@@ -404,22 +400,21 @@ include $(sort $(wildcard package/*/*.mk))
 
 include boot/common.mk
 include linux/linux.mk
-include system/system.mk
 include fs/common.mk
 
 include $(BR2_EXTERNAL)/external.mk
 
-TARGETS_SOURCE := $(patsubst %,%-source,$(TARGETS))
-TARGETS_DIRCLEAN := $(patsubst %,%-dirclean,$(TARGETS))
+PACKAGES_SOURCE := $(patsubst %,%-source,$(PACKAGES))
+PACKAGES_DIRCLEAN := $(patsubst %,%-dirclean,$(PACKAGES))
 
 # host-* dependencies have to be handled specially, as those aren't
-# visible in Kconfig and hence not added to a variable like TARGETS.
+# visible in Kconfig and hence not added to a variable like PACKAGES.
 # instead, find all the host-* targets listed in each <PKG>_DEPENDENCIES
 # variable for each enabled target.
 # Notice: this only works for newstyle gentargets/autotargets packages
 TARGETS_HOST_DEPS = $(sort $(filter host-%,$(foreach dep,\
 		$(addsuffix _DEPENDENCIES,\
-			$(call UPPERCASE,$(TARGETS) $(TARGETS_ROOTFS))),\
+			$(call UPPERCASE,$(PACKAGES) $(TARGETS_ROOTFS))),\
 		$($(dep)))))
 # Host packages can in turn have their own dependencies. Likewise find
 # all the package names listed in the HOST_<PKG>_DEPENDENCIES for each
@@ -431,8 +426,8 @@ HOST_DEPS = $(sort $(foreach dep,\
 		$($(dep))))
 HOST_SOURCE += $(addsuffix -source,$(sort $(TARGETS_HOST_DEPS) $(HOST_DEPS)))
 
-TARGETS_LEGAL_INFO := $(patsubst %,%-legal-info,\
-		$(TARGETS) $(TARGETS_HOST_DEPS) $(HOST_DEPS))))
+PACKAGES_LEGAL_INFO := $(patsubst %,%-legal-info,\
+		$(PACKAGES) $(TARGETS_HOST_DEPS) $(HOST_DEPS))))
 
 dirs: $(BUILD_DIR) $(STAGING_DIR) $(TARGET_DIR) \
 	$(HOST_DIR) $(BINARIES_DIR)
@@ -445,10 +440,9 @@ prepare: $(BUILD_DIR)/buildroot-config/auto.conf
 world: target-post-image
 
 .PHONY: all world toolchain dirs clean distclean source outputmakefile \
-	legal-info legal-info-prepare legal-info-clean printvars \
 	target-finalize target-post-image \
-	$(TARGETS) $(TARGETS_ROOTFS) \
-	$(TARGETS_DIRCLEAN) $(TARGETS_SOURCE) $(TARGETS_LEGAL_INFO) \
+	$(PACKAGES) $(TARGETS_ROOTFS) \
+	$(PACKAGES_DIRCLEAN) $(PACKAGES_SOURCE) $(PACKAGES_LEGAL_INFO) \
 	$(BUILD_DIR) $(STAGING_DIR) $(TARGET_DIR) \
 	$(HOST_DIR) $(BINARIES_DIR)
 
@@ -468,37 +462,6 @@ LIB_SYMLINK = lib64
 else
 LIB_SYMLINK = lib32
 endif
-
-$(STAGING_DIR):
-	@mkdir -p $(STAGING_DIR)/bin
-	@mkdir -p $(STAGING_DIR)/lib
-	@ln -snf lib $(STAGING_DIR)/$(LIB_SYMLINK)
-	@mkdir -p $(STAGING_DIR)/usr/lib
-	@ln -snf lib $(STAGING_DIR)/usr/$(LIB_SYMLINK)
-	@mkdir -p $(STAGING_DIR)/usr/include
-	@mkdir -p $(STAGING_DIR)/usr/bin
-	@ln -snf $(STAGING_DIR) $(BASE_DIR)/staging
-
-ifeq ($(BR2_ROOTFS_SKELETON_CUSTOM),y)
-TARGET_SKELETON = $(BR2_ROOTFS_SKELETON_CUSTOM_PATH)
-endif
-
-RSYNC_VCS_EXCLUSIONS = \
-	--exclude .svn --exclude .git --exclude .hg --exclude .bzr \
-	--exclude CVS
-
-$(BUILD_DIR)/.root:
-	mkdir -p $(TARGET_DIR)
-	rsync -a --ignore-times $(RSYNC_VCS_EXCLUSIONS) \
-		--chmod=Du+w --exclude .empty --exclude '*~' \
-		$(TARGET_SKELETON)/ $(TARGET_DIR)/
-	$(INSTALL) -m 0644 support/misc/target-dir-warning.txt $(TARGET_DIR_WARNING_FILE)
-	@ln -snf lib $(TARGET_DIR)/$(LIB_SYMLINK)
-	@mkdir -p $(TARGET_DIR)/usr
-	@ln -snf lib $(TARGET_DIR)/usr/$(LIB_SYMLINK)
-	touch $@
-
-$(TARGET_DIR): $(BUILD_DIR)/.root
 
 ifeq ($(BR2_PACKAGE_GDB),y)
 BR2_STRIP_EXCLUDE_FILES += libpthread*.so*
@@ -534,7 +497,7 @@ endif
 ifeq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
 GENERATE_LOCALE = $(call qstrip,$(BR2_GENERATE_LOCALE))
 ifneq ($(GENERATE_LOCALE),)
-TARGETS += host-localedef
+PACKAGES += host-localedef
 
 define GENERATE_LOCALES
 	$(Q)mkdir -p $(TARGET_DIR)/usr/lib/locale/
@@ -578,7 +541,7 @@ endif
 
 $(TARGETS_ROOTFS): target-finalize
 
-target-finalize: $(TARGETS)
+target-finalize: $(PACKAGES)
 	@$(call MESSAGE,"Finalizing target directory")
 	$(foreach hook,$(TARGET_FINALIZE_HOOKS),$($(hook))$(sep))
 	rm -rf $(TARGET_DIR)/usr/include $(TARGET_DIR)/usr/share/aclocal \
@@ -648,36 +611,43 @@ target-post-image: $(TARGETS_ROOTFS) target-finalize
 		$(call MESSAGE,"Executing post-image script $(s)"); \
 		$(EXTRA_ENV) $(s) $(BINARIES_DIR) $(call qstrip,$(BR2_ROOTFS_POST_SCRIPT_ARGS))$(sep))
 
-source: $(TARGETS_SOURCE) $(HOST_SOURCE)
+source: $(PACKAGES_SOURCE) $(HOST_SOURCE)
 
 external-deps:
 	@$(MAKE1) -Bs DL_MODE=SHOW_EXTERNAL_DEPS $(EXTRAMAKEARGS) source | sort -u
 
+.PHONY: legal-info-clean
 legal-info-clean:
 	@rm -fr $(LEGAL_INFO_DIR)
 
+.PHONY: legal-info-prepare
 legal-info-prepare: $(LEGAL_INFO_DIR)
-	@$(call MESSAGE,"Collecting legal info")
-	@$(call legal-license-file,buildroot,COPYING,COPYING,HOST)
-	@$(call legal-manifest,PACKAGE,VERSION,LICENSE,LICENSE FILES,SOURCE ARCHIVE,SOURCE SITE,TARGET)
-	@$(call legal-manifest,PACKAGE,VERSION,LICENSE,LICENSE FILES,SOURCE ARCHIVE,SOURCE SITE,HOST)
-	@$(call legal-manifest,buildroot,$(BR2_VERSION_FULL),GPLv2+,COPYING,not saved,not saved,HOST)
+	@$(call MESSAGE,"Buildroot $(BR2_VERSION_FULL) Collecting legal info")
+	@$(call legal-license-file,buildroot,buildroot,support/legal-info/buildroot.hash,COPYING,COPYING,HOST)
+	@$(call legal-manifest,TARGET,PACKAGE,VERSION,LICENSE,LICENSE FILES,SOURCE ARCHIVE,SOURCE SITE,DEPENDENCIES WITH LICENSES)
+	@$(call legal-manifest,HOST,PACKAGE,VERSION,LICENSE,LICENSE FILES,SOURCE ARCHIVE,SOURCE SITE,DEPENDENCIES WITH LICENSES)
+	@$(call legal-manifest,HOST,buildroot,$(BR2_VERSION_FULL),GPL-2.0+,COPYING,not saved,not saved)
 	@$(call legal-warning,the Buildroot source code has not been saved)
-	@$(call legal-warning,the toolchain has not been saved)
 	@cp $(BR2_CONFIG) $(LEGAL_INFO_DIR)/buildroot.config
 
-legal-info: dirs legal-info-clean legal-info-prepare $(TARGETS_LEGAL_INFO) \
+.PHONY: legal-info
+legal-info: legal-info-clean legal-info-prepare $(foreach p,$(PACKAGES),$(p)-all-legal-info) \
 		$(REDIST_SOURCES_DIR_TARGET) $(REDIST_SOURCES_DIR_HOST)
 	@cat support/legal-info/README.header >>$(LEGAL_REPORT)
 	@if [ -r $(LEGAL_WARNINGS) ]; then \
 		cat support/legal-info/README.warnings-header \
 			$(LEGAL_WARNINGS) >>$(LEGAL_REPORT); \
 		cat $(LEGAL_WARNINGS); fi
-	@echo "Legal info produced in $(LEGAL_INFO_DIR)"
 	@rm -f $(LEGAL_WARNINGS)
+	@(cd $(LEGAL_INFO_DIR); \
+		find * -type f -exec sha256sum {} + | LC_ALL=C sort -k2 \
+			>.legal-info.sha256; \
+		mv .legal-info.sha256 legal-info.sha256)
+	@echo "Legal info produced in $(LEGAL_INFO_DIR)"
 
+.PHONY: show-targets
 show-targets:
-	@echo $(HOST_DEPS) $(TARGETS_HOST_DEPS) $(TARGETS) $(TARGETS_ROOTFS)
+	@echo $(sort $(PACKAGES)) $(sort $(TARGETS_ROOTFS))
 
 graph-build: $(O)/build/build-time.log
 	@install -d $(O)/graphs
@@ -841,13 +811,21 @@ ifeq ($(NEED_WRAPPER),y)
 	$(Q)$(TOPDIR)/support/scripts/mkmakefile $(TOPDIR) $(O)
 endif
 
-# printvars prints all the variables currently defined in our Makefiles
+# printvars prints all the variables currently defined in our
+# Makefiles. Alternatively, if a non-empty VARS variable is passed,
+# only the variables matching the make pattern passed in VARS are
+# displayed.
+.PHONY: printvars
 printvars:
-	@$(foreach V, \
-		$(sort $(.VARIABLES)), \
+	@:
+	$(foreach V, \
+		$(sort $(filter $(VARS),$(.VARIABLES))), \
 		$(if $(filter-out environment% default automatic, \
 				$(origin $V)), \
-		$(info $V=$($V) ($(value $V)))))
+		$(if $(QUOTED_VARS),\
+			$(info $V='$(subst ','\'',$(if $(RAW_VARS),$(value $V),$($V)))'), \
+			$(info $V=$(if $(RAW_VARS),$(value $V),$($V))))))
+# ' Syntax colouring...
 
 clean:
 	rm -rf $(TARGET_DIR) $(BINARIES_DIR) $(HOST_DIR) \
