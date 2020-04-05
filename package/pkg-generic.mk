@@ -631,18 +631,16 @@ $(2)_ADD_SKELETON_DEPENDENCY	?= YES
 
 ifeq ($(4),target)
 ifeq ($$($(2)_ADD_SKELETON_DEPENDENCY),YES)
-# TODO(glebm): backport skeleton infra
-# $(2)_DEPENDENCIES += skeleton
+$(2)_DEPENDENCIES += skeleton
 endif
 ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
 $(2)_DEPENDENCIES += toolchain
 endif
 endif
 
-# TODO(glebm): backport skeleton infra
-# ifneq ($(1),host-skeleton)
-# $(2)_DEPENDENCIES += host-skeleton
-# endif
+ifneq ($(1),host-skeleton)
+$(2)_DEPENDENCIES += host-skeleton
+endif
 
 ifneq ($$(filter cvs git svn,$$($(2)_SITE_METHOD)),)
 $(2)_DOWNLOAD_DEPENDENCIES += \
