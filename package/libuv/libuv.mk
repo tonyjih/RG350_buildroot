@@ -6,7 +6,7 @@
 
 # When bumping libuv, check if a new version of uvw is available
 # and bump it too.
-LIBUV_VERSION = 1.33.1
+LIBUV_VERSION = 1.35.0
 LIBUV_SITE = $(call github,libuv,libuv,v$(LIBUV_VERSION))
 LIBUV_DEPENDENCIES = host-pkgconf
 LIBUV_INSTALL_STAGING = YES
@@ -25,7 +25,5 @@ define LIBUV_FIXUP_AUTOGEN
 		>$(@D)/m4/libuv-extra-automake-flags.m4
 endef
 LIBUV_POST_PATCH_HOOKS += LIBUV_FIXUP_AUTOGEN
-HOST_LIBUV_POST_PATCH_HOOKS += LIBUV_FIXUP_AUTOGEN
 
 $(eval $(autotools-package))
-$(eval $(host-autotools-package))

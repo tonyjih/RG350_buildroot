@@ -12,7 +12,7 @@ config BR2_PACKAGE_UVW
 
 	  https://github.com/skypjack/uvw
 
-comment "uvw needs a toolchain w/ NPTL, dynamic library, C++"
+comment "uvw needs a toolchain w/ NPTL, dynamic library, C++, gcc >= 7"
 	depends on !BR2_TOOLCHAIN_HAS_THREADS_NPTL || BR2_STATIC_LIBS || \
 		!BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_MMU

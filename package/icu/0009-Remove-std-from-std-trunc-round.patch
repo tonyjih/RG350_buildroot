@@ -1,0 +1,40 @@
+From 40bbf0f751176f6326a8c00d56d6ec16a2654e72 Mon Sep 17 00:00:00 2001
+From: Gleb Mazovetskiy <glex.spb@gmail.com>
+Date: Mon, 30 Mar 2020 00:27:29 +0100
+Subject: [PATCH] Remove std from std::trunc/round
+
+std::trunc/round fail to compile with GCC 5.4.0 and uclibc 0.9.33.2
+---
+ source/i18n/decimfmt.cpp               | 2 +-
+ source/i18n/number_decimalquantity.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/i18n/decimfmt.cpp b/source/i18n/decimfmt.cpp
+index d19f651..7a9c690 100644
+--- a/source/i18n/decimfmt.cpp
++++ b/source/i18n/decimfmt.cpp
+@@ -1801,7 +1801,7 @@ bool DecimalFormat::fastFormatDouble(double input, UnicodeString& output) const
+         return false;
+     }
+     if (std::isnan(input)
+-            || std::trunc(input) != input
++            || trunc(input) != input
+             || input <= INT32_MIN
+             || input > INT32_MAX) {
+         return false;
+diff --git a/source/i18n/number_decimalquantity.cpp b/source/i18n/number_decimalquantity.cpp
+index 2c4c2ce..23a609f 100644
+--- a/source/i18n/number_decimalquantity.cpp
++++ b/source/i18n/number_decimalquantity.cpp
+@@ -452,7 +452,7 @@ void DecimalQuantity::_setToDoubleFast(double n) {
+         for (; i <= -22; i += 22) n /= 1e22;
+         n /= DOUBLE_MULTIPLIERS[-i];
+     }
+-    auto result = static_cast<int64_t>(std::round(n));
++    auto result = static_cast<int64_t>(round(n));
+     if (result != 0) {
+         _setToLong(result);
+         scale -= fracLength;
+-- 
+2.20.1
+
