@@ -2,6 +2,21 @@
 
 This buildroot can be used to build RG350 cross-compilation toolchain and the OS image.
 
+## Pre-Build Steps
+
+If you are using Debian or Ubuntu, please run:
+~~~bash
+sudo apt-get update -y
+sudo apt-get install -y bison flex gettext texinfo wget cpio mercurial subversion libncurses5-dev libc6-dev-i386 bzr squashfs-tools zip unzip python python3 rsync
+~~~
+
+Or if you are using CentOS, please run:
+
+~~~bash
+yum update -y
+yum install -y autoconf automake bc bison bzip2 flex fontconfig freetype gcc-c++ git glibc-devel glibc-devel.i686 java-1.8.0-openjdk-devel libgcc.i686 libstdc++.i686 m4 make mercurial openssl-devel patch perl-ExtUtils-MakeMaker rsync squashfs-tools subversion zip unzip wget which python3 texinfo
+~~~
+
 ## Build toolchain
 
 First, clone or download the repo and run:
